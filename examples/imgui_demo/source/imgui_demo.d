@@ -2576,13 +2576,13 @@ class ExampleAppConsole
         }
     }
 
-    extern(C) nothrow static int TextEditCallbackStub(ImGuiTextEditCallbackData* data) // In C++11 you are better off using lambdas for this sort of forwarding callbacks
+    extern(C) nothrow static int TextEditCallbackStub(ImGuiInputTextCallback* data) // In C++11 you are better off using lambdas for this sort of forwarding callbacks
     {
         ExampleAppConsole console = cast(ExampleAppConsole)data.UserData;
         return console.TextEditCallback(data);
     }
 
-    nothrow int TextEditCallback(ImGuiTextEditCallbackData* data)
+    nothrow int TextEditCallback(ImGuiInputTextCallbackData* data)
     {
         try {
             //AddLog("cursor: %d, selection: %d-%d", data.CursorPos, data.SelectionStart, data.SelectionEnd);

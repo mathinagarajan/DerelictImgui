@@ -76,6 +76,7 @@ private
     tp = tp.replace('const char*(*)(void* user_data)', 'GetClipboardTextFunc')
     tp = tp.replace('void(*)(void* user_data,const char* text)', 'SetClipboardTextFunc')
     tp = tp.replace('void(*)(int x,int y)', 'ImeSetInputScreenPosFunc')
+    tp = re.sub('const (\w*)', 'const(\g<1>)', tp)
 
     return tp
 
@@ -114,9 +115,54 @@ enum {
 
 struct ImVector(T)
 {
-    int                         Size;
-    int                         Capacity;
-    T*                          Data;
+    int                         Size = 0;
+    int                         Capacity = 0;
+    T*                          Data = null;
+
+    ~this()
+    {
+        import core.stdc.stdlib;
+        if (Data !is null) free(Data);
+    }
+    this(this)
+    {
+        reserve(Capacity);
+    }
+    void clear()
+    {
+        Size = 0;
+    }
+    void reserve(int newcap)
+    {
+        import core.stdc.stdlib;
+        import std.algorithm;
+        T* newData = cast(T*)(malloc(T.sizeof * newcap));
+        auto copysize = min(newcap, Size);
+        newData[0..copysize] = Data[0..copysize];
+        newData[copysize..newcap] = T();
+        Data = newData;
+        Size = copysize;
+        Capacity = newcap;
+    }
+    void resize(int newsize)
+    {
+        if (newsize > Capacity) 
+            reserve(newsize);
+        if (newsize < Capacity)
+            Data[Size..newsize] = T();
+        Size = newsize;
+    }
+    void push_back(ref T item)
+    {
+        if (Size >= Capacity)
+            reserve(Size + 32);
+        range()[Size++] = item;
+    }
+    T pop_back()
+    {
+        return range()[--Size];
+    }
+    T[] range() { return Data[0..Size]; }
 }
 
 % for vector_alias, vt in vector_types.items():

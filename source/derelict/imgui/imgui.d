@@ -441,9 +441,54 @@ enum {
 
 struct ImVector(T)
 {
-    int                         Size;
-    int                         Capacity;
-    T*                          Data;
+    int                         Size = 0;
+    int                         Capacity = 0;
+    T*                          Data = null;
+
+    ~this()
+    {
+        import core.stdc.stdlib;
+        if (Data !is null) free(Data);
+    }
+    this(this)
+    {
+        reserve(Capacity);
+    }
+    void clear()
+    {
+        Size = 0;
+    }
+    void reserve(int newcap)
+    {
+        import core.stdc.stdlib;
+        import std.algorithm;
+        T* newData = cast(T*)(malloc(T.sizeof * newcap));
+        auto copysize = min(newcap, Size);
+        newData[0..copysize] = Data[0..copysize];
+        newData[copysize..newcap] = T();
+        Data = newData;
+        Size = copysize;
+        Capacity = newcap;
+    }
+    void resize(int newsize)
+    {
+        if (newsize > Capacity) 
+            reserve(newsize);
+        if (newsize < Capacity)
+            Data[Size..newsize] = T();
+        Size = newsize;
+    }
+    void push_back(ref T item)
+    {
+        if (Size >= Capacity)
+            reserve(Size + 32);
+        range()[Size++] = item;
+    }
+    T pop_back()
+    {
+        return range()[--Size];
+    }
+    T[] range() { return Data[0..Size]; }
 }
 
 alias ImVector_ImDrawCmd = ImVector!(ImDrawCmd);
@@ -476,8 +521,8 @@ struct ImDrawList
     ImVector_ImDrawIdx IdxBuffer;
     ImVector_ImDrawVert VtxBuffer;
     ImDrawListFlags Flags;
-    const ImDrawListSharedData* _Data;
-    const char* _OwnerName;
+    const(ImDrawListSharedData)* _Data;
+    const(char)* _OwnerName;
     uint _VtxCurrentIdx;
     ImDrawVert* _VtxWritePtr;
     ImDrawIdx* _IdxWritePtr;
@@ -501,7 +546,7 @@ struct ImFont
     ImVector_ImFontGlyph Glyphs;
     ImVector_float IndexAdvanceX;
     ImVector_ImWchar IndexLookup;
-    const ImFontGlyph* FallbackGlyph;
+    const(ImFontGlyph)* FallbackGlyph;
     float FallbackAdvanceX;
     ImWchar FallbackChar;
     short ConfigDataCount;
@@ -590,7 +635,7 @@ struct ImFontConfig
     bool PixelSnapH;
     ImVec2 GlyphExtraSpacing;
     ImVec2 GlyphOffset;
-    const ImWchar* GlyphRanges;
+    const(ImWchar)* GlyphRanges;
     float GlyphMinAdvanceX;
     float GlyphMaxAdvanceX;
     bool MergeMode;
@@ -661,8 +706,8 @@ struct ImDrawCmd
 }
 struct TextRange
 {
-    const char* b;
-    const char* e;
+    const(char)* b;
+    const(char)* e;
 }
 struct ImGuiOnceUponAFrame
 {
@@ -675,8 +720,8 @@ struct ImGuiIO
     ImVec2 DisplaySize;
     float DeltaTime;
     float IniSavingRate;
-    const char* IniFilename;
-    const char* LogFilename;
+    const(char)* IniFilename;
+    const(char)* LogFilename;
     float MouseDoubleClickTime;
     float MouseDoubleClickMaxDist;
     float MouseDragThreshold;
