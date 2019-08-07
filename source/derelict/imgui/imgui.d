@@ -43,6 +43,38 @@ private
     import core.stdc.stdarg:va_list;
 }
 
+// Helpers macros to generate 32-bits encoded colors
+version(IMGUI_USE_BGRA_PACKED_COLOR) {
+    enum IM_COL32_R_SHIFT    = 16;
+    enum IM_COL32_G_SHIFT    = 8;
+    enum IM_COL32_B_SHIFT    = 0;
+    enum IM_COL32_A_SHIFT    = 24;
+    enum IM_COL32_A_MASK     = 0xFF000000;
+} else {
+    enum IM_COL32_R_SHIFT    = 0;
+    enum IM_COL32_G_SHIFT    = 8;
+    enum IM_COL32_B_SHIFT    = 16;
+    enum IM_COL32_A_SHIFT    = 24;
+    enum IM_COL32_A_MASK     = 0xFF000000;
+}
+uint IM_COL32(ubyte R, ubyte G, ubyte B, ubyte A = 255) {
+    return (
+            (cast(ImU32)(A)<<IM_COL32_A_SHIFT) | 
+            (cast(ImU32)(B)<<IM_COL32_B_SHIFT) | 
+            (cast(ImU32)(G)<<IM_COL32_G_SHIFT) | 
+            (cast(ImU32)(R)<<IM_COL32_R_SHIFT)
+            );
+}
+@property uint IM_COL32_WHITE() {
+    return IM_COL32(255,255,255,255);   // Opaque white = 0xFFFFFFFF
+}
+@property uint IM_COL32_BLACK() {
+    return IM_COL32(0,0,0,255);         // Opaque black
+}
+@property uint IM_COL32_BLACK_TRANS() {
+    return IM_COL32(0,0,0,0);           // Transparent black = 0x00000000
+}
+
 
 
 alias ImGuiColumnsFlags    = int;
@@ -489,6 +521,13 @@ struct ImVector(T)
         return range()[--Size];
     }
     T[] range() { return Data[0..Size]; }
+    const(T[]) range() const { return Data[0..Size]; }
+    ref T opIndex(int index) {
+        return range()[index];
+    }
+    ref const(T) opIndex(int index) const {
+        return range()[index];
+    }
 }
 
 alias ImVector_ImDrawCmd = ImVector!(ImDrawCmd);
@@ -514,7 +553,9 @@ struct ImDrawVert
     ImVec2 pos;
     ImVec2 uv;
     ImU32 col;
+
 }
+
 struct ImDrawList
 {
     ImVector_ImDrawCmd CmdBuffer;
@@ -532,12 +573,244 @@ struct ImDrawList
     int _ChannelsCurrent;
     int _ChannelsCount;
     ImVector_ImDrawChannel _Channels;
+
+//    alias ChannelsSetCurrent = ImDrawList_ChannelsSetCurrent;
+
+    void ChannelsSetCurrent(A...)(A a) { ImDrawList_ChannelsSetCurrent(&this, a); }
+//    void ChannelsSetCurrent(int channel_index) { ImDrawList_ChannelsSetCurrent(this, channel_index); }
+//    alias ChannelsSplit = ImDrawList_ChannelsSplit;
+
+    void ChannelsSplit(A...)(A a) { ImDrawList_ChannelsSplit(&this, a); }
+//    void ChannelsSplit(int channels_count) { ImDrawList_ChannelsSplit(this, channels_count); }
+//    alias Clear = ImDrawList_Clear;
+
+    void Clear(A...)(A a) { ImDrawList_Clear(&this, a); }
+//    void Clear() { ImDrawList_Clear(this, ); }
+//    alias AddPolyline = ImDrawList_AddPolyline;
+
+    void AddPolyline(A...)(A a) { ImDrawList_AddPolyline(&this, a); }
+//    void AddPolyline(const ImVec2* points,const int num_points,ImU32 col,bool closed,float thickness) { ImDrawList_AddPolyline(this, points,num_points,col,closed,thickness); }
+//    alias destroy = ImDrawList_destroy;
+
+    void destroy(A...)(A a) { ImDrawList_destroy(&this, a); }
+//    void destroy() { ImDrawList_destroy(this, self); }
+//    alias PopClipRect = ImDrawList_PopClipRect;
+
+    void PopClipRect(A...)(A a) { ImDrawList_PopClipRect(&this, a); }
+//    void PopClipRect() { ImDrawList_PopClipRect(this, ); }
+//    alias PushClipRect = ImDrawList_PushClipRect;
+
+    void PushClipRect(A...)(A a) { ImDrawList_PushClipRect(&this, a); }
+//    void PushClipRect(ImVec2 clip_rect_min,ImVec2 clip_rect_max,bool intersect_with_current_clip_rect = false) { ImDrawList_PushClipRect(this, clip_rect_min,clip_rect_max,intersect_with_current_clip_rect); }
+//    alias PathBezierCurveTo = ImDrawList_PathBezierCurveTo;
+
+    void PathBezierCurveTo(A...)(A a) { ImDrawList_PathBezierCurveTo(&this, a); }
+//    void PathBezierCurveTo(const ImVec2 p1,const ImVec2 p2,const ImVec2 p3,int num_segments = 0) { ImDrawList_PathBezierCurveTo(this, p1,p2,p3,num_segments); }
+//    alias UpdateTextureID = ImDrawList_UpdateTextureID;
+
+    void UpdateTextureID(A...)(A a) { ImDrawList_UpdateTextureID(&this, a); }
+//    void UpdateTextureID() { ImDrawList_UpdateTextureID(this, ); }
+//    alias AddCallback = ImDrawList_AddCallback;
+
+    void AddCallback(A...)(A a) { ImDrawList_AddCallback(&this, a); }
+//    void AddCallback(ImDrawCallback callback,void* callback_data) { ImDrawList_AddCallback(this, callback,callback_data); }
+//    alias PathFillConvex = ImDrawList_PathFillConvex;
+
+    void PathFillConvex(A...)(A a) { ImDrawList_PathFillConvex(&this, a); }
+//    void PathFillConvex(ImU32 col) { ImDrawList_PathFillConvex(this, col); }
+//    alias PushTextureID = ImDrawList_PushTextureID;
+
+    void PushTextureID(A...)(A a) { ImDrawList_PushTextureID(&this, a); }
+//    void PushTextureID(ImTextureID texture_id) { ImDrawList_PushTextureID(this, texture_id); }
+//    alias AddBezierCurve = ImDrawList_AddBezierCurve;
+
+    void AddBezierCurve(A...)(A a) { ImDrawList_AddBezierCurve(&this, a); }
+//    void AddBezierCurve(const ImVec2 pos0,const ImVec2 cp0,const ImVec2 cp1,const ImVec2 pos1,ImU32 col,float thickness,int num_segments = 0) { ImDrawList_AddBezierCurve(this, pos0,cp0,cp1,pos1,col,thickness,num_segments); }
+//    alias AddDrawCmd = ImDrawList_AddDrawCmd;
+
+    void AddDrawCmd(A...)(A a) { ImDrawList_AddDrawCmd(&this, a); }
+//    void AddDrawCmd() { ImDrawList_AddDrawCmd(this, ); }
+//    alias UpdateClipRect = ImDrawList_UpdateClipRect;
+
+    void UpdateClipRect(A...)(A a) { ImDrawList_UpdateClipRect(&this, a); }
+//    void UpdateClipRect() { ImDrawList_UpdateClipRect(this, ); }
+//    alias PrimVtx = ImDrawList_PrimVtx;
+
+    void PrimVtx(A...)(A a) { ImDrawList_PrimVtx(&this, a); }
+//    void PrimVtx(const ImVec2 pos,const ImVec2 uv,ImU32 col) { ImDrawList_PrimVtx(this, pos,uv,col); }
+//    alias PrimRect = ImDrawList_PrimRect;
+
+    void PrimRect(A...)(A a) { ImDrawList_PrimRect(&this, a); }
+//    void PrimRect(const ImVec2 a,const ImVec2 b,ImU32 col) { ImDrawList_PrimRect(this, a,b,col); }
+//    alias AddRectFilled = ImDrawList_AddRectFilled;
+
+    void AddRectFilled(A...)(A a) { ImDrawList_AddRectFilled(&this, a); }
+//    void AddRectFilled(const ImVec2 a,const ImVec2 b,ImU32 col,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All) { ImDrawList_AddRectFilled(this, a,b,col,rounding,rounding_corners_flags); }
+//    alias ClearFreeMemory = ImDrawList_ClearFreeMemory;
+
+    void ClearFreeMemory(A...)(A a) { ImDrawList_ClearFreeMemory(&this, a); }
+//    void ClearFreeMemory() { ImDrawList_ClearFreeMemory(this, ); }
+//    alias CloneOutput = ImDrawList_CloneOutput;
+
+    ImDrawList* CloneOutput(A...)(A a) { return ImDrawList_CloneOutput(&this, a); }
+//    ImDrawList* CloneOutput() { return ImDrawList_CloneOutput(this, ); }
+//    alias AddRect = ImDrawList_AddRect;
+
+    void AddRect(A...)(A a) { ImDrawList_AddRect(&this, a); }
+//    void AddRect(const ImVec2 a,const ImVec2 b,ImU32 col,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All,float thickness = 1.0f) { ImDrawList_AddRect(this, a,b,col,rounding,rounding_corners_flags,thickness); }
+//    alias PathRect = ImDrawList_PathRect;
+
+    void PathRect(A...)(A a) { ImDrawList_PathRect(&this, a); }
+//    void PathRect(const ImVec2 rect_min,const ImVec2 rect_max,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All) { ImDrawList_PathRect(this, rect_min,rect_max,rounding,rounding_corners_flags); }
+//    alias PathArcToFast = ImDrawList_PathArcToFast;
+
+    void PathArcToFast(A...)(A a) { ImDrawList_PathArcToFast(&this, a); }
+//    void PathArcToFast(const ImVec2 centre,float radius,int a_min_of_12,int a_max_of_12) { ImDrawList_PathArcToFast(this, centre,radius,a_min_of_12,a_max_of_12); }
+//    alias PathStroke = ImDrawList_PathStroke;
+
+    void PathStroke(A...)(A a) { ImDrawList_PathStroke(&this, a); }
+//    void PathStroke(ImU32 col,bool closed,float thickness = 1.0f) { ImDrawList_PathStroke(this, col,closed,thickness); }
+//    alias PathLineToMergeDuplicate = ImDrawList_PathLineToMergeDuplicate;
+
+    void PathLineToMergeDuplicate(A...)(A a) { ImDrawList_PathLineToMergeDuplicate(&this, a); }
+//    void PathLineToMergeDuplicate(const ImVec2 pos) { ImDrawList_PathLineToMergeDuplicate(this, pos); }
+//    alias AddConvexPolyFilled = ImDrawList_AddConvexPolyFilled;
+
+    void AddConvexPolyFilled(A...)(A a) { ImDrawList_AddConvexPolyFilled(&this, a); }
+//    void AddConvexPolyFilled(const ImVec2* points,const int num_points,ImU32 col) { ImDrawList_AddConvexPolyFilled(this, points,num_points,col); }
+//    alias PathArcTo = ImDrawList_PathArcTo;
+
+    void PathArcTo(A...)(A a) { ImDrawList_PathArcTo(&this, a); }
+//    void PathArcTo(const ImVec2 centre,float radius,float a_min,float a_max,int num_segments = 10) { ImDrawList_PathArcTo(this, centre,radius,a_min,a_max,num_segments); }
+//    alias AddImageQuad = ImDrawList_AddImageQuad;
+
+    void AddImageQuad(A...)(A a) { ImDrawList_AddImageQuad(&this, a); }
+//    void AddImageQuad(ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,const ImVec2 uv_a = ImVec2(0,0),const ImVec2 uv_b = ImVec2(1,0),const ImVec2 uv_c = ImVec2(1,1),const ImVec2 uv_d = ImVec2(0,1),ImU32 col = 0xFFFFFFFF) { ImDrawList_AddImageQuad(this, user_texture_id,a,b,c,d,uv_a,uv_b,uv_c,uv_d,col); }
+//    alias AddImage = ImDrawList_AddImage;
+
+    void AddImage(A...)(A a) { ImDrawList_AddImage(&this, a); }
+//    void AddImage(ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 uv_a = ImVec2(0,0),const ImVec2 uv_b = ImVec2(1,1),ImU32 col = 0xFFFFFFFF) { ImDrawList_AddImage(this, user_texture_id,a,b,uv_a,uv_b,col); }
+//    alias AddText = ImDrawList_AddText;
+
+    void AddText(A...)(A a) { ImDrawList_AddText(&this, a); }
+//    void AddText(const ImVec2 pos,ImU32 col,const char* text_begin,const char* text_end = null) { ImDrawList_AddText(this, pos,col,text_begin,text_end); }
+//    alias AddTextFontPtr = ImDrawList_AddTextFontPtr;
+
+    void AddTextFontPtr(A...)(A a) { ImDrawList_AddTextFontPtr(&this, a); }
+//    void AddTextFontPtr(const ImFont* font,float font_size,const ImVec2 pos,ImU32 col,const char* text_begin,const char* text_end = null,float wrap_width = 0.0f,const ImVec4* cpu_fine_clip_rect = null) { ImDrawList_AddTextFontPtr(this, font,font_size,pos,col,text_begin,text_end,wrap_width,cpu_fine_clip_rect); }
+//    alias AddCircleFilled = ImDrawList_AddCircleFilled;
+
+    void AddCircleFilled(A...)(A a) { ImDrawList_AddCircleFilled(&this, a); }
+//    void AddCircleFilled(const ImVec2 centre,float radius,ImU32 col,int num_segments = 12) { ImDrawList_AddCircleFilled(this, centre,radius,col,num_segments); }
+//    alias AddCircle = ImDrawList_AddCircle;
+
+    void AddCircle(A...)(A a) { ImDrawList_AddCircle(&this, a); }
+//    void AddCircle(const ImVec2 centre,float radius,ImU32 col,int num_segments = 12,float thickness = 1.0f) { ImDrawList_AddCircle(this, centre,radius,col,num_segments,thickness); }
+//    alias AddTriangleFilled = ImDrawList_AddTriangleFilled;
+
+    void AddTriangleFilled(A...)(A a) { ImDrawList_AddTriangleFilled(&this, a); }
+//    void AddTriangleFilled(const ImVec2 a,const ImVec2 b,const ImVec2 c,ImU32 col) { ImDrawList_AddTriangleFilled(this, a,b,c,col); }
+//    alias AddTriangle = ImDrawList_AddTriangle;
+
+    void AddTriangle(A...)(A a) { ImDrawList_AddTriangle(&this, a); }
+//    void AddTriangle(const ImVec2 a,const ImVec2 b,const ImVec2 c,ImU32 col,float thickness = 1.0f) { ImDrawList_AddTriangle(this, a,b,c,col,thickness); }
+//    alias AddQuadFilled = ImDrawList_AddQuadFilled;
+
+    void AddQuadFilled(A...)(A a) { ImDrawList_AddQuadFilled(&this, a); }
+//    void AddQuadFilled(const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,ImU32 col) { ImDrawList_AddQuadFilled(this, a,b,c,d,col); }
+//    alias AddQuad = ImDrawList_AddQuad;
+
+    void AddQuad(A...)(A a) { ImDrawList_AddQuad(&this, a); }
+//    void AddQuad(const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,ImU32 col,float thickness = 1.0f) { ImDrawList_AddQuad(this, a,b,c,d,col,thickness); }
+//    alias AddRectFilledMultiColor = ImDrawList_AddRectFilledMultiColor;
+
+    void AddRectFilledMultiColor(A...)(A a) { ImDrawList_AddRectFilledMultiColor(&this, a); }
+//    void AddRectFilledMultiColor(const ImVec2 a,const ImVec2 b,ImU32 col_upr_left,ImU32 col_upr_right,ImU32 col_bot_right,ImU32 col_bot_left) { ImDrawList_AddRectFilledMultiColor(this, a,b,col_upr_left,col_upr_right,col_bot_right,col_bot_left); }
+//    alias PrimReserve = ImDrawList_PrimReserve;
+
+    void PrimReserve(A...)(A a) { ImDrawList_PrimReserve(&this, a); }
+//    void PrimReserve(int idx_count,int vtx_count) { ImDrawList_PrimReserve(this, idx_count,vtx_count); }
+//    alias AddLine = ImDrawList_AddLine;
+
+    void AddLine(A...)(A a) { ImDrawList_AddLine(&this, a); }
+//    void AddLine(const ImVec2 a,const ImVec2 b,ImU32 col,float thickness = 1.0f) { ImDrawList_AddLine(this, a,b,col,thickness); }
+//    alias GetClipRectMin = ImDrawList_GetClipRectMin;
+
+    ImVec2 GetClipRectMin(A...)(A a) { return ImDrawList_GetClipRectMin(&this, a); }
+//    ImVec2 GetClipRectMin() { return ImDrawList_GetClipRectMin(this, ); }
+//    alias PopTextureID = ImDrawList_PopTextureID;
+
+    void PopTextureID(A...)(A a) { ImDrawList_PopTextureID(&this, a); }
+//    void PopTextureID() { ImDrawList_PopTextureID(this, ); }
+//    alias ImDrawList = ImDrawList_ImDrawList;
+
+    static ImDrawList* from(A...)(A a) { return ImDrawList_ImDrawList(a); }
+//    ImDrawList* ImDrawList(const ImDrawListSharedData* shared_data) { return ImDrawList_ImDrawList(this, shared_data); }
+//    alias PrimWriteVtx = ImDrawList_PrimWriteVtx;
+
+    void PrimWriteVtx(A...)(A a) { ImDrawList_PrimWriteVtx(&this, a); }
+//    void PrimWriteVtx(const ImVec2 pos,const ImVec2 uv,ImU32 col) { ImDrawList_PrimWriteVtx(this, pos,uv,col); }
+//    alias GetClipRectMax = ImDrawList_GetClipRectMax;
+
+    ImVec2 GetClipRectMax(A...)(A a) { return ImDrawList_GetClipRectMax(&this, a); }
+//    ImVec2 GetClipRectMax() { return ImDrawList_GetClipRectMax(this, ); }
+//    alias AddImageRounded = ImDrawList_AddImageRounded;
+
+    void AddImageRounded(A...)(A a) { ImDrawList_AddImageRounded(&this, a); }
+//    void AddImageRounded(ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 uv_a,const ImVec2 uv_b,ImU32 col,float rounding,int rounding_corners = ImDrawCornerFlags_All) { ImDrawList_AddImageRounded(this, user_texture_id,a,b,uv_a,uv_b,col,rounding,rounding_corners); }
+//    alias PrimQuadUV = ImDrawList_PrimQuadUV;
+
+    void PrimQuadUV(A...)(A a) { ImDrawList_PrimQuadUV(&this, a); }
+//    void PrimQuadUV(const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,const ImVec2 uv_a,const ImVec2 uv_b,const ImVec2 uv_c,const ImVec2 uv_d,ImU32 col) { ImDrawList_PrimQuadUV(this, a,b,c,d,uv_a,uv_b,uv_c,uv_d,col); }
+//    alias PathClear = ImDrawList_PathClear;
+
+    void PathClear(A...)(A a) { ImDrawList_PathClear(&this, a); }
+//    void PathClear() { ImDrawList_PathClear(this, ); }
+//    alias PrimWriteIdx = ImDrawList_PrimWriteIdx;
+
+    void PrimWriteIdx(A...)(A a) { ImDrawList_PrimWriteIdx(&this, a); }
+//    void PrimWriteIdx(ImDrawIdx idx) { ImDrawList_PrimWriteIdx(this, idx); }
+//    alias PushClipRectFullScreen = ImDrawList_PushClipRectFullScreen;
+
+    void PushClipRectFullScreen(A...)(A a) { ImDrawList_PushClipRectFullScreen(&this, a); }
+//    void PushClipRectFullScreen() { ImDrawList_PushClipRectFullScreen(this, ); }
+//    alias ChannelsMerge = ImDrawList_ChannelsMerge;
+
+    void ChannelsMerge(A...)(A a) { ImDrawList_ChannelsMerge(&this, a); }
+//    void ChannelsMerge() { ImDrawList_ChannelsMerge(this, ); }
+//    alias PathLineTo = ImDrawList_PathLineTo;
+
+    void PathLineTo(A...)(A a) { ImDrawList_PathLineTo(&this, a); }
+//    void PathLineTo(const ImVec2 pos) { ImDrawList_PathLineTo(this, pos); }
+//    alias PrimRectUV = ImDrawList_PrimRectUV;
+
+    void PrimRectUV(A...)(A a) { ImDrawList_PrimRectUV(&this, a); }
+//    void PrimRectUV(const ImVec2 a,const ImVec2 b,const ImVec2 uv_a,const ImVec2 uv_b,ImU32 col) { ImDrawList_PrimRectUV(this, a,b,uv_a,uv_b,col); }
 }
+
 struct Pair
 {
     ImGuiID key;
     union { int val_i; float val_f; void* val_p; };
+
+//    alias destroy = Pair_destroy;
+
+    void destroy(A...)(A a) { Pair_destroy(&this, a); }
+//    void destroy() { Pair_destroy(this, self); }
+//    alias PairInt = Pair_PairInt;
+
+    static Pair* fromInt(A...)(A a) { return Pair_PairInt(a); }
+//    Pair* PairInt(ImGuiID _key,int _val_i) { return Pair_PairInt(this, _key,_val_i); }
+//    alias PairFloat = Pair_PairFloat;
+
+    static Pair* fromFloat(A...)(A a) { return Pair_PairFloat(a); }
+//    Pair* PairFloat(ImGuiID _key,float _val_f) { return Pair_PairFloat(this, _key,_val_f); }
+//    alias PairPtr = Pair_PairPtr;
+
+    static Pair* fromPtr(A...)(A a) { return Pair_PairPtr(a); }
+//    Pair* PairPtr(ImGuiID _key,void* _val_p) { return Pair_PairPtr(this, _key,_val_p); }
 }
+
 struct ImFont
 {
     float FontSize;
@@ -556,7 +829,77 @@ struct ImFont
     float Descent;
     bool DirtyLookupTables;
     int MetricsTotalSurface;
+
+//    alias AddRemapChar = ImFont_AddRemapChar;
+
+    void AddRemapChar(A...)(A a) { ImFont_AddRemapChar(&this, a); }
+//    void AddRemapChar(ImWchar dst,ImWchar src,bool overwrite_dst = true) { ImFont_AddRemapChar(this, dst,src,overwrite_dst); }
+//    alias AddGlyph = ImFont_AddGlyph;
+
+    void AddGlyph(A...)(A a) { ImFont_AddGlyph(&this, a); }
+//    void AddGlyph(ImWchar c,float x0,float y0,float x1,float y1,float u0,float v0,float u1,float v1,float advance_x) { ImFont_AddGlyph(this, c,x0,y0,x1,y1,u0,v0,u1,v1,advance_x); }
+//    alias GrowIndex = ImFont_GrowIndex;
+
+    void GrowIndex(A...)(A a) { ImFont_GrowIndex(&this, a); }
+//    void GrowIndex(int new_size) { ImFont_GrowIndex(this, new_size); }
+//    alias RenderText = ImFont_RenderText;
+
+    void RenderText(A...)(A a) { ImFont_RenderText(&this, a); }
+//    void RenderText(ImDrawList* draw_list,float size,ImVec2 pos,ImU32 col,const ImVec4 clip_rect,const char* text_begin,const char* text_end,float wrap_width = 0.0f,bool cpu_fine_clip = false) { ImFont_RenderText(this, draw_list,size,pos,col,clip_rect,text_begin,text_end,wrap_width,cpu_fine_clip); }
+//    alias CalcWordWrapPositionA = ImFont_CalcWordWrapPositionA;
+
+    const(char)* CalcWordWrapPositionA(A...)(A a) { return ImFont_CalcWordWrapPositionA(&this, a); }
+//    const(char)* CalcWordWrapPositionA(float scale,const char* text,const char* text_end,float wrap_width) { return ImFont_CalcWordWrapPositionA(this, scale,text,text_end,wrap_width); }
+//    alias CalcTextSizeA = ImFont_CalcTextSizeA;
+
+    ImVec2 CalcTextSizeA(A...)(A a) { return ImFont_CalcTextSizeA(&this, a); }
+//    ImVec2 CalcTextSizeA(float size,float max_width,float wrap_width,const char* text_begin,const char* text_end = null,const char** remaining = null) { return ImFont_CalcTextSizeA(this, size,max_width,wrap_width,text_begin,text_end,remaining); }
+//    alias IsLoaded = ImFont_IsLoaded;
+
+    bool IsLoaded(A...)(A a) { return ImFont_IsLoaded(&this, a); }
+//    bool IsLoaded() { return ImFont_IsLoaded(this, ); }
+//    alias GetCharAdvance = ImFont_GetCharAdvance;
+
+    float GetCharAdvance(A...)(A a) { return ImFont_GetCharAdvance(&this, a); }
+//    float GetCharAdvance(ImWchar c) { return ImFont_GetCharAdvance(this, c); }
+//    alias SetFallbackChar = ImFont_SetFallbackChar;
+
+    void SetFallbackChar(A...)(A a) { ImFont_SetFallbackChar(&this, a); }
+//    void SetFallbackChar(ImWchar c) { ImFont_SetFallbackChar(this, c); }
+//    alias FindGlyphNoFallback = ImFont_FindGlyphNoFallback;
+
+    const(ImFontGlyph)* FindGlyphNoFallback(A...)(A a) { return ImFont_FindGlyphNoFallback(&this, a); }
+//    const(ImFontGlyph)* FindGlyphNoFallback(ImWchar c) { return ImFont_FindGlyphNoFallback(this, c); }
+//    alias FindGlyph = ImFont_FindGlyph;
+
+    const(ImFontGlyph)* FindGlyph(A...)(A a) { return ImFont_FindGlyph(&this, a); }
+//    const(ImFontGlyph)* FindGlyph(ImWchar c) { return ImFont_FindGlyph(this, c); }
+//    alias RenderChar = ImFont_RenderChar;
+
+    void RenderChar(A...)(A a) { ImFont_RenderChar(&this, a); }
+//    void RenderChar(ImDrawList* draw_list,float size,ImVec2 pos,ImU32 col,ImWchar c) { ImFont_RenderChar(this, draw_list,size,pos,col,c); }
+//    alias ImFont = ImFont_ImFont;
+
+    static ImFont* from(A...)(A a) { return ImFont_ImFont(a); }
+//    ImFont* ImFont() { return ImFont_ImFont(this, ); }
+//    alias GetDebugName = ImFont_GetDebugName;
+
+    const(char)* GetDebugName(A...)(A a) { return ImFont_GetDebugName(&this, a); }
+//    const(char)* GetDebugName() { return ImFont_GetDebugName(this, ); }
+//    alias BuildLookupTable = ImFont_BuildLookupTable;
+
+    void BuildLookupTable(A...)(A a) { ImFont_BuildLookupTable(&this, a); }
+//    void BuildLookupTable() { ImFont_BuildLookupTable(this, ); }
+//    alias ClearOutputData = ImFont_ClearOutputData;
+
+    void ClearOutputData(A...)(A a) { ImFont_ClearOutputData(&this, a); }
+//    void ClearOutputData() { ImFont_ClearOutputData(this, ); }
+//    alias destroy = ImFont_destroy;
+
+    void destroy(A...)(A a) { ImFont_destroy(&this, a); }
+//    void destroy() { ImFont_destroy(this, self); }
 }
+
 struct ImGuiListClipper
 {
     float StartPosY;
@@ -565,7 +908,29 @@ struct ImGuiListClipper
     int StepNo;
     int DisplayStart;
     int DisplayEnd;
+
+//    alias destroy = ImGuiListClipper_destroy;
+
+    void destroy(A...)(A a) { ImGuiListClipper_destroy(&this, a); }
+//    void destroy() { ImGuiListClipper_destroy(this, self); }
+//    alias End = ImGuiListClipper_End;
+
+    void End(A...)(A a) { ImGuiListClipper_End(&this, a); }
+//    void End() { ImGuiListClipper_End(this, ); }
+//    alias Begin = ImGuiListClipper_Begin;
+
+    void Begin(A...)(A a) { ImGuiListClipper_Begin(&this, a); }
+//    void Begin(int items_count,float items_height = -1.0f) { ImGuiListClipper_Begin(this, items_count,items_height); }
+//    alias Step = ImGuiListClipper_Step;
+
+    bool Step(A...)(A a) { return ImGuiListClipper_Step(&this, a); }
+//    bool Step() { return ImGuiListClipper_Step(this, ); }
+//    alias ImGuiListClipper = ImGuiListClipper_ImGuiListClipper;
+
+    static ImGuiListClipper* from(A...)(A a) { return ImGuiListClipper_ImGuiListClipper(a); }
+//    ImGuiListClipper* ImGuiListClipper(int items_count = -1,float items_height = -1.0f) { return ImGuiListClipper_ImGuiListClipper(this, items_count,items_height); }
 }
+
 struct CustomRect
 {
     uint ID;
@@ -576,22 +941,146 @@ struct CustomRect
     float GlyphAdvanceX;
     ImVec2 GlyphOffset;
     ImFont* Font;
+
+//    alias destroy = CustomRect_destroy;
+
+    void destroy(A...)(A a) { CustomRect_destroy(&this, a); }
+//    void destroy() { CustomRect_destroy(this, self); }
+//    alias IsPacked = CustomRect_IsPacked;
+
+    bool IsPacked(A...)(A a) { return CustomRect_IsPacked(&this, a); }
+//    bool IsPacked() { return CustomRect_IsPacked(this, ); }
+//    alias CustomRect = CustomRect_CustomRect;
+
+    static CustomRect* from(A...)(A a) { return CustomRect_CustomRect(a); }
+//    CustomRect* CustomRect() { return CustomRect_CustomRect(this, ); }
 }
+
 struct ImVec4
 {
     float x;
     float y;
     float z;
     float w;
+
+//    alias ImVec4 = ImVec4_ImVec4;
+
+    static ImVec4* from(A...)(A a) { return ImVec4_ImVec4(a); }
+//    ImVec4* ImVec4() { return ImVec4_ImVec4(this, ); }
+//    alias ImVec4Float = ImVec4_ImVec4Float;
+
+    static ImVec4* fromFloat(A...)(A a) { return ImVec4_ImVec4Float(a); }
+//    ImVec4* ImVec4Float(float _x,float _y,float _z,float _w) { return ImVec4_ImVec4Float(this, _x,_y,_z,_w); }
+//    alias destroy = ImVec4_destroy;
+
+    void destroy(A...)(A a) { ImVec4_destroy(&this, a); }
+//    void destroy() { ImVec4_destroy(this, self); }
 }
+
 struct GlyphRangesBuilder
 {
     ImVector_unsigned_char UsedChars;
+
+//    alias GlyphRangesBuilder = GlyphRangesBuilder_GlyphRangesBuilder;
+
+    static GlyphRangesBuilder* from(A...)(A a) { return GlyphRangesBuilder_GlyphRangesBuilder(a); }
+//    GlyphRangesBuilder* GlyphRangesBuilder() { return GlyphRangesBuilder_GlyphRangesBuilder(this, ); }
+//    alias AddText = GlyphRangesBuilder_AddText;
+
+    void AddText(A...)(A a) { GlyphRangesBuilder_AddText(&this, a); }
+//    void AddText(const char* text,const char* text_end = null) { GlyphRangesBuilder_AddText(this, text,text_end); }
+//    alias AddRanges = GlyphRangesBuilder_AddRanges;
+
+    void AddRanges(A...)(A a) { GlyphRangesBuilder_AddRanges(&this, a); }
+//    void AddRanges(const ImWchar* ranges) { GlyphRangesBuilder_AddRanges(this, ranges); }
+//    alias SetBit = GlyphRangesBuilder_SetBit;
+
+    void SetBit(A...)(A a) { GlyphRangesBuilder_SetBit(&this, a); }
+//    void SetBit(int n) { GlyphRangesBuilder_SetBit(this, n); }
+//    alias BuildRanges = GlyphRangesBuilder_BuildRanges;
+
+    void BuildRanges(A...)(A a) { GlyphRangesBuilder_BuildRanges(&this, a); }
+//    void BuildRanges(ImVector_ImWchar* out_ranges) { GlyphRangesBuilder_BuildRanges(this, out_ranges); }
+//    alias GetBit = GlyphRangesBuilder_GetBit;
+
+    bool GetBit(A...)(A a) { return GlyphRangesBuilder_GetBit(&this, a); }
+//    bool GetBit(int n) { return GlyphRangesBuilder_GetBit(this, n); }
+//    alias AddChar = GlyphRangesBuilder_AddChar;
+
+    void AddChar(A...)(A a) { GlyphRangesBuilder_AddChar(&this, a); }
+//    void AddChar(ImWchar c) { GlyphRangesBuilder_AddChar(this, c); }
+//    alias destroy = GlyphRangesBuilder_destroy;
+
+    void destroy(A...)(A a) { GlyphRangesBuilder_destroy(&this, a); }
+//    void destroy() { GlyphRangesBuilder_destroy(this, self); }
 }
+
 struct ImGuiStorage
 {
     ImVector_Pair Data;
+
+//    alias GetBoolRef = ImGuiStorage_GetBoolRef;
+
+    bool* GetBoolRef(A...)(A a) { return ImGuiStorage_GetBoolRef(&this, a); }
+//    bool* GetBoolRef(ImGuiID key,bool default_val = false) { return ImGuiStorage_GetBoolRef(this, key,default_val); }
+//    alias SetAllInt = ImGuiStorage_SetAllInt;
+
+    void SetAllInt(A...)(A a) { ImGuiStorage_SetAllInt(&this, a); }
+//    void SetAllInt(int val) { ImGuiStorage_SetAllInt(this, val); }
+//    alias GetVoidPtr = ImGuiStorage_GetVoidPtr;
+
+    void* GetVoidPtr(A...)(A a) { return ImGuiStorage_GetVoidPtr(&this, a); }
+//    void* GetVoidPtr(ImGuiID key) { return ImGuiStorage_GetVoidPtr(this, key); }
+//    alias GetFloatRef = ImGuiStorage_GetFloatRef;
+
+    float* GetFloatRef(A...)(A a) { return ImGuiStorage_GetFloatRef(&this, a); }
+//    float* GetFloatRef(ImGuiID key,float default_val = 0.0f) { return ImGuiStorage_GetFloatRef(this, key,default_val); }
+//    alias GetFloat = ImGuiStorage_GetFloat;
+
+    float GetFloat(A...)(A a) { return ImGuiStorage_GetFloat(&this, a); }
+//    float GetFloat(ImGuiID key,float default_val = 0.0f) { return ImGuiStorage_GetFloat(this, key,default_val); }
+//    alias GetVoidPtrRef = ImGuiStorage_GetVoidPtrRef;
+
+    void** GetVoidPtrRef(A...)(A a) { return ImGuiStorage_GetVoidPtrRef(&this, a); }
+//    void** GetVoidPtrRef(ImGuiID key,void* default_val = null) { return ImGuiStorage_GetVoidPtrRef(this, key,default_val); }
+//    alias GetIntRef = ImGuiStorage_GetIntRef;
+
+    int* GetIntRef(A...)(A a) { return ImGuiStorage_GetIntRef(&this, a); }
+//    int* GetIntRef(ImGuiID key,int default_val = 0) { return ImGuiStorage_GetIntRef(this, key,default_val); }
+//    alias SetVoidPtr = ImGuiStorage_SetVoidPtr;
+
+    void SetVoidPtr(A...)(A a) { ImGuiStorage_SetVoidPtr(&this, a); }
+//    void SetVoidPtr(ImGuiID key,void* val) { ImGuiStorage_SetVoidPtr(this, key,val); }
+//    alias SetFloat = ImGuiStorage_SetFloat;
+
+    void SetFloat(A...)(A a) { ImGuiStorage_SetFloat(&this, a); }
+//    void SetFloat(ImGuiID key,float val) { ImGuiStorage_SetFloat(this, key,val); }
+//    alias BuildSortByKey = ImGuiStorage_BuildSortByKey;
+
+    void BuildSortByKey(A...)(A a) { ImGuiStorage_BuildSortByKey(&this, a); }
+//    void BuildSortByKey() { ImGuiStorage_BuildSortByKey(this, ); }
+//    alias SetBool = ImGuiStorage_SetBool;
+
+    void SetBool(A...)(A a) { ImGuiStorage_SetBool(&this, a); }
+//    void SetBool(ImGuiID key,bool val) { ImGuiStorage_SetBool(this, key,val); }
+//    alias GetBool = ImGuiStorage_GetBool;
+
+    bool GetBool(A...)(A a) { return ImGuiStorage_GetBool(&this, a); }
+//    bool GetBool(ImGuiID key,bool default_val = false) { return ImGuiStorage_GetBool(this, key,default_val); }
+//    alias SetInt = ImGuiStorage_SetInt;
+
+    void SetInt(A...)(A a) { ImGuiStorage_SetInt(&this, a); }
+//    void SetInt(ImGuiID key,int val) { ImGuiStorage_SetInt(this, key,val); }
+//    alias Clear = ImGuiStorage_Clear;
+
+    void Clear(A...)(A a) { ImGuiStorage_Clear(&this, a); }
+//    void Clear() { ImGuiStorage_Clear(this, ); }
+//    alias GetInt = ImGuiStorage_GetInt;
+
+    int GetInt(A...)(A a) { return ImGuiStorage_GetInt(&this, a); }
+//    int GetInt(ImGuiID key,int default_val = 0) { return ImGuiStorage_GetInt(this, key,default_val); }
 }
+
 struct ImFontAtlas
 {
     bool Locked;
@@ -609,7 +1098,125 @@ struct ImFontAtlas
     ImVector_CustomRect CustomRects;
     ImVector_ImFontConfig ConfigData;
     int[1] CustomRectIds;
+
+//    alias destroy = ImFontAtlas_destroy;
+
+    void destroy(A...)(A a) { ImFontAtlas_destroy(&this, a); }
+//    void destroy() { ImFontAtlas_destroy(this, self); }
+//    alias AddFontFromMemoryCompressedBase85TTF = ImFontAtlas_AddFontFromMemoryCompressedBase85TTF;
+
+    ImFont* AddFontFromMemoryCompressedBase85TTF(A...)(A a) { return ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(&this, a); }
+//    ImFont* AddFontFromMemoryCompressedBase85TTF(const char* compressed_font_data_base85,float size_pixels,const ImFontConfig* font_cfg = null,const ImWchar* glyph_ranges = null) { return ImFontAtlas_AddFontFromMemoryCompressedBase85TTF(this, compressed_font_data_base85,size_pixels,font_cfg,glyph_ranges); }
+//    alias Build = ImFontAtlas_Build;
+
+    bool Build(A...)(A a) { return ImFontAtlas_Build(&this, a); }
+//    bool Build() { return ImFontAtlas_Build(this, ); }
+//    alias CalcCustomRectUV = ImFontAtlas_CalcCustomRectUV;
+
+    void CalcCustomRectUV(A...)(A a) { ImFontAtlas_CalcCustomRectUV(&this, a); }
+//    void CalcCustomRectUV(const CustomRect* rect,ImVec2* out_uv_min,ImVec2* out_uv_max) { ImFontAtlas_CalcCustomRectUV(this, rect,out_uv_min,out_uv_max); }
+//    alias GetCustomRectByIndex = ImFontAtlas_GetCustomRectByIndex;
+
+    const(CustomRect)* GetCustomRectByIndex(A...)(A a) { return ImFontAtlas_GetCustomRectByIndex(&this, a); }
+//    const(CustomRect)* GetCustomRectByIndex(int index) { return ImFontAtlas_GetCustomRectByIndex(this, index); }
+//    alias AddCustomRectRegular = ImFontAtlas_AddCustomRectRegular;
+
+    int AddCustomRectRegular(A...)(A a) { return ImFontAtlas_AddCustomRectRegular(&this, a); }
+//    int AddCustomRectRegular(uint id,int width,int height) { return ImFontAtlas_AddCustomRectRegular(this, id,width,height); }
+//    alias IsBuilt = ImFontAtlas_IsBuilt;
+
+    bool IsBuilt(A...)(A a) { return ImFontAtlas_IsBuilt(&this, a); }
+//    bool IsBuilt() { return ImFontAtlas_IsBuilt(this, ); }
+//    alias GetGlyphRangesThai = ImFontAtlas_GetGlyphRangesThai;
+
+    const(ImWchar)* GetGlyphRangesThai(A...)(A a) { return ImFontAtlas_GetGlyphRangesThai(&this, a); }
+//    const(ImWchar)* GetGlyphRangesThai() { return ImFontAtlas_GetGlyphRangesThai(this, ); }
+//    alias GetGlyphRangesCyrillic = ImFontAtlas_GetGlyphRangesCyrillic;
+
+    const(ImWchar)* GetGlyphRangesCyrillic(A...)(A a) { return ImFontAtlas_GetGlyphRangesCyrillic(&this, a); }
+//    const(ImWchar)* GetGlyphRangesCyrillic() { return ImFontAtlas_GetGlyphRangesCyrillic(this, ); }
+//    alias GetGlyphRangesChineseSimplifiedCommon = ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon;
+
+    const(ImWchar)* GetGlyphRangesChineseSimplifiedCommon(A...)(A a) { return ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(&this, a); }
+//    const(ImWchar)* GetGlyphRangesChineseSimplifiedCommon() { return ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon(this, ); }
+//    alias GetGlyphRangesChineseFull = ImFontAtlas_GetGlyphRangesChineseFull;
+
+    const(ImWchar)* GetGlyphRangesChineseFull(A...)(A a) { return ImFontAtlas_GetGlyphRangesChineseFull(&this, a); }
+//    const(ImWchar)* GetGlyphRangesChineseFull() { return ImFontAtlas_GetGlyphRangesChineseFull(this, ); }
+//    alias GetGlyphRangesDefault = ImFontAtlas_GetGlyphRangesDefault;
+
+    const(ImWchar)* GetGlyphRangesDefault(A...)(A a) { return ImFontAtlas_GetGlyphRangesDefault(&this, a); }
+//    const(ImWchar)* GetGlyphRangesDefault() { return ImFontAtlas_GetGlyphRangesDefault(this, ); }
+//    alias SetTexID = ImFontAtlas_SetTexID;
+
+    void SetTexID(A...)(A a) { ImFontAtlas_SetTexID(&this, a); }
+//    void SetTexID(ImTextureID id) { ImFontAtlas_SetTexID(this, id); }
+//    alias AddFontFromMemoryCompressedTTF = ImFontAtlas_AddFontFromMemoryCompressedTTF;
+
+    ImFont* AddFontFromMemoryCompressedTTF(A...)(A a) { return ImFontAtlas_AddFontFromMemoryCompressedTTF(&this, a); }
+//    ImFont* AddFontFromMemoryCompressedTTF(const void* compressed_font_data,int compressed_font_size,float size_pixels,const ImFontConfig* font_cfg = null,const ImWchar* glyph_ranges = null) { return ImFontAtlas_AddFontFromMemoryCompressedTTF(this, compressed_font_data,compressed_font_size,size_pixels,font_cfg,glyph_ranges); }
+//    alias ClearFonts = ImFontAtlas_ClearFonts;
+
+    void ClearFonts(A...)(A a) { ImFontAtlas_ClearFonts(&this, a); }
+//    void ClearFonts() { ImFontAtlas_ClearFonts(this, ); }
+//    alias ClearTexData = ImFontAtlas_ClearTexData;
+
+    void ClearTexData(A...)(A a) { ImFontAtlas_ClearTexData(&this, a); }
+//    void ClearTexData() { ImFontAtlas_ClearTexData(this, ); }
+//    alias Clear = ImFontAtlas_Clear;
+
+    void Clear(A...)(A a) { ImFontAtlas_Clear(&this, a); }
+//    void Clear() { ImFontAtlas_Clear(this, ); }
+//    alias AddFontFromMemoryTTF = ImFontAtlas_AddFontFromMemoryTTF;
+
+    ImFont* AddFontFromMemoryTTF(A...)(A a) { return ImFontAtlas_AddFontFromMemoryTTF(&this, a); }
+//    ImFont* AddFontFromMemoryTTF(void* font_data,int font_size,float size_pixels,const ImFontConfig* font_cfg = null,const ImWchar* glyph_ranges = null) { return ImFontAtlas_AddFontFromMemoryTTF(this, font_data,font_size,size_pixels,font_cfg,glyph_ranges); }
+//    alias AddFontFromFileTTF = ImFontAtlas_AddFontFromFileTTF;
+
+    ImFont* AddFontFromFileTTF(A...)(A a) { return ImFontAtlas_AddFontFromFileTTF(&this, a); }
+//    ImFont* AddFontFromFileTTF(const char* filename,float size_pixels,const ImFontConfig* font_cfg = null,const ImWchar* glyph_ranges = null) { return ImFontAtlas_AddFontFromFileTTF(this, filename,size_pixels,font_cfg,glyph_ranges); }
+//    alias AddFontDefault = ImFontAtlas_AddFontDefault;
+
+    ImFont* AddFontDefault(A...)(A a) { return ImFontAtlas_AddFontDefault(&this, a); }
+//    ImFont* AddFontDefault(const ImFontConfig* font_cfg = null) { return ImFontAtlas_AddFontDefault(this, font_cfg); }
+//    alias AddFont = ImFontAtlas_AddFont;
+
+    ImFont* AddFont(A...)(A a) { return ImFontAtlas_AddFont(&this, a); }
+//    ImFont* AddFont(const ImFontConfig* font_cfg) { return ImFontAtlas_AddFont(this, font_cfg); }
+//    alias GetGlyphRangesJapanese = ImFontAtlas_GetGlyphRangesJapanese;
+
+    const(ImWchar)* GetGlyphRangesJapanese(A...)(A a) { return ImFontAtlas_GetGlyphRangesJapanese(&this, a); }
+//    const(ImWchar)* GetGlyphRangesJapanese() { return ImFontAtlas_GetGlyphRangesJapanese(this, ); }
+//    alias GetTexDataAsAlpha8 = ImFontAtlas_GetTexDataAsAlpha8;
+
+    void GetTexDataAsAlpha8(A...)(A a) { ImFontAtlas_GetTexDataAsAlpha8(&this, a); }
+//    void GetTexDataAsAlpha8(char** out_pixels,int* out_width,int* out_height,int* out_bytes_per_pixel = null) { ImFontAtlas_GetTexDataAsAlpha8(this, out_pixels,out_width,out_height,out_bytes_per_pixel); }
+//    alias ClearInputData = ImFontAtlas_ClearInputData;
+
+    void ClearInputData(A...)(A a) { ImFontAtlas_ClearInputData(&this, a); }
+//    void ClearInputData() { ImFontAtlas_ClearInputData(this, ); }
+//    alias GetMouseCursorTexData = ImFontAtlas_GetMouseCursorTexData;
+
+    bool GetMouseCursorTexData(A...)(A a) { return ImFontAtlas_GetMouseCursorTexData(&this, a); }
+//    bool GetMouseCursorTexData(ImGuiMouseCursor cursor,ImVec2* out_offset,ImVec2* out_size,ImVec2[2] out_uv_border,ImVec2[2] out_uv_fill) { return ImFontAtlas_GetMouseCursorTexData(this, cursor,out_offset,out_size,out_uv_border,out_uv_fill); }
+//    alias GetGlyphRangesKorean = ImFontAtlas_GetGlyphRangesKorean;
+
+    const(ImWchar)* GetGlyphRangesKorean(A...)(A a) { return ImFontAtlas_GetGlyphRangesKorean(&this, a); }
+//    const(ImWchar)* GetGlyphRangesKorean() { return ImFontAtlas_GetGlyphRangesKorean(this, ); }
+//    alias GetTexDataAsRGBA32 = ImFontAtlas_GetTexDataAsRGBA32;
+
+    void GetTexDataAsRGBA32(A...)(A a) { ImFontAtlas_GetTexDataAsRGBA32(&this, a); }
+//    void GetTexDataAsRGBA32(char** out_pixels,int* out_width,int* out_height,int* out_bytes_per_pixel = null) { ImFontAtlas_GetTexDataAsRGBA32(this, out_pixels,out_width,out_height,out_bytes_per_pixel); }
+//    alias AddCustomRectFontGlyph = ImFontAtlas_AddCustomRectFontGlyph;
+
+    int AddCustomRectFontGlyph(A...)(A a) { return ImFontAtlas_AddCustomRectFontGlyph(&this, a); }
+//    int AddCustomRectFontGlyph(ImFont* font,ImWchar id,int width,int height,float advance_x,const ImVec2 offset = ImVec2(0,0)) { return ImFontAtlas_AddCustomRectFontGlyph(this, font,id,width,height,advance_x,offset); }
+//    alias ImFontAtlas = ImFontAtlas_ImFontAtlas;
+
+    static ImFontAtlas* from(A...)(A a) { return ImFontAtlas_ImFontAtlas(a); }
+//    ImFontAtlas* ImFontAtlas() { return ImFontAtlas_ImFontAtlas(this, ); }
 }
+
 struct ImFontGlyph
 {
     ImWchar Codepoint;
@@ -622,7 +1229,9 @@ struct ImFontGlyph
     float V0;
     float U1;
     float V1;
+
 }
+
 struct ImFontConfig
 {
     void* FontData;
@@ -643,7 +1252,17 @@ struct ImFontConfig
     float RasterizerMultiply;
     char[40] Name;
     ImFont* DstFont;
+
+//    alias ImFontConfig = ImFontConfig_ImFontConfig;
+
+    static ImFontConfig* from(A...)(A a) { return ImFontConfig_ImFontConfig(a); }
+//    ImFontConfig* ImFontConfig() { return ImFontConfig_ImFontConfig(this, ); }
+//    alias destroy = ImFontConfig_destroy;
+
+    void destroy(A...)(A a) { ImFontConfig_destroy(&this, a); }
+//    void destroy() { ImFontConfig_destroy(this, self); }
 }
+
 struct ImDrawData
 {
     bool Valid;
@@ -653,11 +1272,79 @@ struct ImDrawData
     int TotalVtxCount;
     ImVec2 DisplayPos;
     ImVec2 DisplaySize;
+
+//    alias ScaleClipRects = ImDrawData_ScaleClipRects;
+
+    void ScaleClipRects(A...)(A a) { ImDrawData_ScaleClipRects(&this, a); }
+//    void ScaleClipRects(const ImVec2 sc) { ImDrawData_ScaleClipRects(this, sc); }
+//    alias DeIndexAllBuffers = ImDrawData_DeIndexAllBuffers;
+
+    void DeIndexAllBuffers(A...)(A a) { ImDrawData_DeIndexAllBuffers(&this, a); }
+//    void DeIndexAllBuffers() { ImDrawData_DeIndexAllBuffers(this, ); }
+//    alias Clear = ImDrawData_Clear;
+
+    void Clear(A...)(A a) { ImDrawData_Clear(&this, a); }
+//    void Clear() { ImDrawData_Clear(this, ); }
+//    alias destroy = ImDrawData_destroy;
+
+    void destroy(A...)(A a) { ImDrawData_destroy(&this, a); }
+//    void destroy() { ImDrawData_destroy(this, self); }
+//    alias ImDrawData = ImDrawData_ImDrawData;
+
+    static ImDrawData* from(A...)(A a) { return ImDrawData_ImDrawData(a); }
+//    ImDrawData* ImDrawData() { return ImDrawData_ImDrawData(this, ); }
 }
+
 struct ImGuiTextBuffer
 {
     ImVector_char Buf;
+
+//    alias destroy = ImGuiTextBuffer_destroy;
+
+    void destroy(A...)(A a) { ImGuiTextBuffer_destroy(&this, a); }
+//    void destroy() { ImGuiTextBuffer_destroy(this, self); }
+//    alias size = ImGuiTextBuffer_size;
+
+    int size(A...)(A a) { return ImGuiTextBuffer_size(&this, a); }
+//    int size() { return ImGuiTextBuffer_size(this, ); }
+//    alias appendfv = ImGuiTextBuffer_appendfv;
+
+    void appendfv(A...)(A a) { ImGuiTextBuffer_appendfv(&this, a); }
+//    void appendfv(const char* fmt,va_list args) { ImGuiTextBuffer_appendfv(this, fmt,args); }
+//    alias clear = ImGuiTextBuffer_clear;
+
+    void clear(A...)(A a) { ImGuiTextBuffer_clear(&this, a); }
+//    void clear() { ImGuiTextBuffer_clear(this, ); }
+//    alias appendf = ImGuiTextBuffer_appendf;
+
+    void appendf(A...)(A a) { ImGuiTextBuffer_appendf(&this, a); }
+//    void appendf(const char* fmt,...) { ImGuiTextBuffer_appendf(this, fmt,...); }
+//    alias c_str = ImGuiTextBuffer_c_str;
+
+    const(char)* c_str(A...)(A a) { return ImGuiTextBuffer_c_str(&this, a); }
+//    const(char)* c_str() { return ImGuiTextBuffer_c_str(this, ); }
+//    alias reserve = ImGuiTextBuffer_reserve;
+
+    void reserve(A...)(A a) { ImGuiTextBuffer_reserve(&this, a); }
+//    void reserve(int capacity) { ImGuiTextBuffer_reserve(this, capacity); }
+//    alias empty = ImGuiTextBuffer_empty;
+
+    bool empty(A...)(A a) { return ImGuiTextBuffer_empty(&this, a); }
+//    bool empty() { return ImGuiTextBuffer_empty(this, ); }
+//    alias begin = ImGuiTextBuffer_begin;
+
+    const(char)* begin(A...)(A a) { return ImGuiTextBuffer_begin(&this, a); }
+//    const(char)* begin() { return ImGuiTextBuffer_begin(this, ); }
+//    alias ImGuiTextBuffer = ImGuiTextBuffer_ImGuiTextBuffer;
+
+    static ImGuiTextBuffer* from(A...)(A a) { return ImGuiTextBuffer_ImGuiTextBuffer(a); }
+//    ImGuiTextBuffer* ImGuiTextBuffer() { return ImGuiTextBuffer_ImGuiTextBuffer(this, ); }
+//    alias end = ImGuiTextBuffer_end;
+
+    const(char)* end(A...)(A a) { return ImGuiTextBuffer_end(&this, a); }
+//    const(char)* end() { return ImGuiTextBuffer_end(this, ); }
 }
+
 struct ImGuiStyle
 {
     float Alpha;
@@ -690,12 +1377,28 @@ struct ImGuiStyle
     bool AntiAliasedFill;
     float CurveTessellationTol;
     ImVec4[ImGuiCol_COUNT] Colors;
+
+//    alias destroy = ImGuiStyle_destroy;
+
+    void destroy(A...)(A a) { ImGuiStyle_destroy(&this, a); }
+//    void destroy() { ImGuiStyle_destroy(this, self); }
+//    alias ImGuiStyle = ImGuiStyle_ImGuiStyle;
+
+    static ImGuiStyle* from(A...)(A a) { return ImGuiStyle_ImGuiStyle(a); }
+//    ImGuiStyle* ImGuiStyle() { return ImGuiStyle_ImGuiStyle(this, ); }
+//    alias ScaleAllSizes = ImGuiStyle_ScaleAllSizes;
+
+    void ScaleAllSizes(A...)(A a) { ImGuiStyle_ScaleAllSizes(&this, a); }
+//    void ScaleAllSizes(float scale_factor) { ImGuiStyle_ScaleAllSizes(this, scale_factor); }
 }
+
 struct ImDrawChannel
 {
     ImVector_ImDrawCmd CmdBuffer;
     ImVector_ImDrawIdx IdxBuffer;
+
 }
+
 struct ImDrawCmd
 {
     uint ElemCount;
@@ -703,16 +1406,66 @@ struct ImDrawCmd
     ImTextureID TextureId;
     ImDrawCallback UserCallback;
     void* UserCallbackData;
+
+//    alias destroy = ImDrawCmd_destroy;
+
+    void destroy(A...)(A a) { ImDrawCmd_destroy(&this, a); }
+//    void destroy() { ImDrawCmd_destroy(this, self); }
+//    alias ImDrawCmd = ImDrawCmd_ImDrawCmd;
+
+    static ImDrawCmd* from(A...)(A a) { return ImDrawCmd_ImDrawCmd(a); }
+//    ImDrawCmd* ImDrawCmd() { return ImDrawCmd_ImDrawCmd(this, ); }
 }
+
 struct TextRange
 {
     const(char)* b;
     const(char)* e;
+
+//    alias destroy = TextRange_destroy;
+
+    void destroy(A...)(A a) { TextRange_destroy(&this, a); }
+//    void destroy() { TextRange_destroy(this, self); }
+//    alias split = TextRange_split;
+
+    void split(A...)(A a) { TextRange_split(&this, a); }
+//    void split(char separator,ImVector_TextRange* out_) { TextRange_split(this, separator,out); }
+//    alias end = TextRange_end;
+
+    const(char)* end(A...)(A a) { return TextRange_end(&this, a); }
+//    const(char)* end() { return TextRange_end(this, ); }
+//    alias begin = TextRange_begin;
+
+    const(char)* begin(A...)(A a) { return TextRange_begin(&this, a); }
+//    const(char)* begin() { return TextRange_begin(this, ); }
+//    alias TextRange = TextRange_TextRange;
+
+    static TextRange* from(A...)(A a) { return TextRange_TextRange(a); }
+//    TextRange* TextRange() { return TextRange_TextRange(this, ); }
+//    alias TextRangeStr = TextRange_TextRangeStr;
+
+    static TextRange* fromStr(A...)(A a) { return TextRange_TextRangeStr(a); }
+//    TextRange* TextRangeStr(const char* _b,const char* _e) { return TextRange_TextRangeStr(this, _b,_e); }
+//    alias empty = TextRange_empty;
+
+    bool empty(A...)(A a) { return TextRange_empty(&this, a); }
+//    bool empty() { return TextRange_empty(this, ); }
 }
+
 struct ImGuiOnceUponAFrame
 {
     int RefFrame;
+
+//    alias ImGuiOnceUponAFrame = ImGuiOnceUponAFrame_ImGuiOnceUponAFrame;
+
+    static ImGuiOnceUponAFrame* from(A...)(A a) { return ImGuiOnceUponAFrame_ImGuiOnceUponAFrame(a); }
+//    ImGuiOnceUponAFrame* ImGuiOnceUponAFrame() { return ImGuiOnceUponAFrame_ImGuiOnceUponAFrame(this, ); }
+//    alias destroy = ImGuiOnceUponAFrame_destroy;
+
+    void destroy(A...)(A a) { ImGuiOnceUponAFrame_destroy(&this, a); }
+//    void destroy() { ImGuiOnceUponAFrame_destroy(this, self); }
 }
+
 struct ImGuiIO
 {
     ImGuiConfigFlags ConfigFlags;
@@ -786,7 +1539,29 @@ struct ImGuiIO
     float[512] KeysDownDurationPrev;
     float[ImGuiNavInput_COUNT] NavInputsDownDuration;
     float[ImGuiNavInput_COUNT] NavInputsDownDurationPrev;
+
+//    alias destroy = ImGuiIO_destroy;
+
+    void destroy(A...)(A a) { ImGuiIO_destroy(&this, a); }
+//    void destroy() { ImGuiIO_destroy(this, self); }
+//    alias AddInputCharactersUTF8 = ImGuiIO_AddInputCharactersUTF8;
+
+    void AddInputCharactersUTF8(A...)(A a) { ImGuiIO_AddInputCharactersUTF8(&this, a); }
+//    void AddInputCharactersUTF8(const char* utf8_chars) { ImGuiIO_AddInputCharactersUTF8(this, utf8_chars); }
+//    alias ClearInputCharacters = ImGuiIO_ClearInputCharacters;
+
+    void ClearInputCharacters(A...)(A a) { ImGuiIO_ClearInputCharacters(&this, a); }
+//    void ClearInputCharacters() { ImGuiIO_ClearInputCharacters(this, ); }
+//    alias ImGuiIO = ImGuiIO_ImGuiIO;
+
+    static ImGuiIO* from(A...)(A a) { return ImGuiIO_ImGuiIO(a); }
+//    ImGuiIO* ImGuiIO() { return ImGuiIO_ImGuiIO(this, ); }
+//    alias AddInputCharacter = ImGuiIO_AddInputCharacter;
+
+    void AddInputCharacter(A...)(A a) { ImGuiIO_AddInputCharacter(&this, a); }
+//    void AddInputCharacter(ImWchar c) { ImGuiIO_AddInputCharacter(this, c); }
 }
+
 struct ImGuiPayload
 {
     void* Data;
@@ -797,24 +1572,116 @@ struct ImGuiPayload
     char[32+1] DataType;
     bool Preview;
     bool Delivery;
+
+//    alias destroy = ImGuiPayload_destroy;
+
+    void destroy(A...)(A a) { ImGuiPayload_destroy(&this, a); }
+//    void destroy() { ImGuiPayload_destroy(this, self); }
+//    alias Clear = ImGuiPayload_Clear;
+
+    void Clear(A...)(A a) { ImGuiPayload_Clear(&this, a); }
+//    void Clear() { ImGuiPayload_Clear(this, ); }
+//    alias IsPreview = ImGuiPayload_IsPreview;
+
+    bool IsPreview(A...)(A a) { return ImGuiPayload_IsPreview(&this, a); }
+//    bool IsPreview() { return ImGuiPayload_IsPreview(this, ); }
+//    alias IsDataType = ImGuiPayload_IsDataType;
+
+    bool IsDataType(A...)(A a) { return ImGuiPayload_IsDataType(&this, a); }
+//    bool IsDataType(const char* type) { return ImGuiPayload_IsDataType(this, type); }
+//    alias ImGuiPayload = ImGuiPayload_ImGuiPayload;
+
+    static ImGuiPayload* from(A...)(A a) { return ImGuiPayload_ImGuiPayload(a); }
+//    ImGuiPayload* ImGuiPayload() { return ImGuiPayload_ImGuiPayload(this, ); }
+//    alias IsDelivery = ImGuiPayload_IsDelivery;
+
+    bool IsDelivery(A...)(A a) { return ImGuiPayload_IsDelivery(&this, a); }
+//    bool IsDelivery() { return ImGuiPayload_IsDelivery(this, ); }
 }
+
 struct ImColor
 {
     ImVec4 Value;
+
+//    alias SetHSV = ImColor_SetHSV;
+
+    void SetHSV(A...)(A a) { ImColor_SetHSV(&this, a); }
+//    void SetHSV(float h,float s,float v,float a = 1.0f) { ImColor_SetHSV(this, h,s,v,a); }
+//    alias destroy = ImColor_destroy;
+
+    void destroy(A...)(A a) { ImColor_destroy(&this, a); }
+//    void destroy() { ImColor_destroy(this, self); }
+//    alias ImColor = ImColor_ImColor;
+
+    static ImColor* from(A...)(A a) { return ImColor_ImColor(a); }
+//    ImColor* ImColor() { return ImColor_ImColor(this, ); }
+//    alias ImColorInt = ImColor_ImColorInt;
+
+    static ImColor* fromInt(A...)(A a) { return ImColor_ImColorInt(a); }
+//    ImColor* ImColorInt(int r,int g,int b,int a = 255) { return ImColor_ImColorInt(this, r,g,b,a); }
+//    alias ImColorU32 = ImColor_ImColorU32;
+
+    static ImColor* fromU32(A...)(A a) { return ImColor_ImColorU32(a); }
+//    ImColor* ImColorU32(ImU32 rgba) { return ImColor_ImColorU32(this, rgba); }
+//    alias ImColorFloat = ImColor_ImColorFloat;
+
+    static ImColor* fromFloat(A...)(A a) { return ImColor_ImColorFloat(a); }
+//    ImColor* ImColorFloat(float r,float g,float b,float a = 1.0f) { return ImColor_ImColorFloat(this, r,g,b,a); }
+//    alias ImColorVec4 = ImColor_ImColorVec4;
+
+    static ImColor* fromVec4(A...)(A a) { return ImColor_ImColorVec4(a); }
+//    ImColor* ImColorVec4(const ImVec4 col) { return ImColor_ImColorVec4(this, col); }
+//    alias HSV = ImColor_HSV;
+
+    ImColor HSV(A...)(A a) { return ImColor_HSV(&this, a); }
+//    ImColor HSV(float h,float s,float v,float a = 1.0f) { return ImColor_HSV(this, h,s,v,a); }
 }
+
 struct ImGuiSizeCallbackData
 {
     void* UserData;
     ImVec2 Pos;
     ImVec2 CurrentSize;
     ImVec2 DesiredSize;
+
 }
+
 struct ImGuiTextFilter
 {
     char[256] InputBuf;
     ImVector_TextRange Filters;
     int CountGrep;
+
+//    alias Build = ImGuiTextFilter_Build;
+
+    void Build(A...)(A a) { ImGuiTextFilter_Build(&this, a); }
+//    void Build() { ImGuiTextFilter_Build(this, ); }
+//    alias Draw = ImGuiTextFilter_Draw;
+
+    bool Draw(A...)(A a) { return ImGuiTextFilter_Draw(&this, a); }
+//    bool Draw(const char* label = "Filter(inc,-exc)",float width = 0.0f) { return ImGuiTextFilter_Draw(this, label,width); }
+//    alias ImGuiTextFilter = ImGuiTextFilter_ImGuiTextFilter;
+
+    static ImGuiTextFilter* from(A...)(A a) { return ImGuiTextFilter_ImGuiTextFilter(a); }
+//    ImGuiTextFilter* ImGuiTextFilter(const char* default_filter = "") { return ImGuiTextFilter_ImGuiTextFilter(this, default_filter); }
+//    alias IsActive = ImGuiTextFilter_IsActive;
+
+    bool IsActive(A...)(A a) { return ImGuiTextFilter_IsActive(&this, a); }
+//    bool IsActive() { return ImGuiTextFilter_IsActive(this, ); }
+//    alias Clear = ImGuiTextFilter_Clear;
+
+    void Clear(A...)(A a) { ImGuiTextFilter_Clear(&this, a); }
+//    void Clear() { ImGuiTextFilter_Clear(this, ); }
+//    alias destroy = ImGuiTextFilter_destroy;
+
+    void destroy(A...)(A a) { ImGuiTextFilter_destroy(&this, a); }
+//    void destroy() { ImGuiTextFilter_destroy(this, self); }
+//    alias PassFilter = ImGuiTextFilter_PassFilter;
+
+    bool PassFilter(A...)(A a) { return ImGuiTextFilter_PassFilter(&this, a); }
+//    bool PassFilter(const char* text,const char* text_end = null) { return ImGuiTextFilter_PassFilter(this, text,text_end); }
 }
+
 struct ImGuiInputTextCallbackData
 {
     ImGuiInputTextFlags EventFlag;
@@ -829,431 +1696,550 @@ struct ImGuiInputTextCallbackData
     int CursorPos;
     int SelectionStart;
     int SelectionEnd;
+
+//    alias destroy = ImGuiInputTextCallbackData_destroy;
+
+    void destroy(A...)(A a) { ImGuiInputTextCallbackData_destroy(&this, a); }
+//    void destroy() { ImGuiInputTextCallbackData_destroy(this, self); }
+//    alias HasSelection = ImGuiInputTextCallbackData_HasSelection;
+
+    bool HasSelection(A...)(A a) { return ImGuiInputTextCallbackData_HasSelection(&this, a); }
+//    bool HasSelection() { return ImGuiInputTextCallbackData_HasSelection(this, ); }
+//    alias ImGuiInputTextCallbackData = ImGuiInputTextCallbackData_ImGuiInputTextCallbackData;
+
+    static ImGuiInputTextCallbackData* from(A...)(A a) { return ImGuiInputTextCallbackData_ImGuiInputTextCallbackData(a); }
+//    ImGuiInputTextCallbackData* ImGuiInputTextCallbackData() { return ImGuiInputTextCallbackData_ImGuiInputTextCallbackData(this, ); }
+//    alias DeleteChars = ImGuiInputTextCallbackData_DeleteChars;
+
+    void DeleteChars(A...)(A a) { ImGuiInputTextCallbackData_DeleteChars(&this, a); }
+//    void DeleteChars(int pos,int bytes_count) { ImGuiInputTextCallbackData_DeleteChars(this, pos,bytes_count); }
+//    alias InsertChars = ImGuiInputTextCallbackData_InsertChars;
+
+    void InsertChars(A...)(A a) { ImGuiInputTextCallbackData_InsertChars(&this, a); }
+//    void InsertChars(int pos,const char* text,const char* text_end = null) { ImGuiInputTextCallbackData_InsertChars(this, pos,text,text_end); }
 }
+
 struct ImVec2
 {
     float x;
     float y;
+
+//    alias destroy = ImVec2_destroy;
+
+    void destroy(A...)(A a) { ImVec2_destroy(&this, a); }
+//    void destroy() { ImVec2_destroy(this, self); }
+//    alias ImVec2 = ImVec2_ImVec2;
+
+    static ImVec2* from(A...)(A a) { return ImVec2_ImVec2(a); }
+//    ImVec2* ImVec2() { return ImVec2_ImVec2(this, ); }
+//    alias ImVec2Float = ImVec2_ImVec2Float;
+
+    static ImVec2* fromFloat(A...)(A a) { return ImVec2_ImVec2Float(a); }
+//    ImVec2* ImVec2Float(float _x,float _y) { return ImVec2_ImVec2Float(this, _x,_y); }
 }
 
-extern(C) @nogc nothrow
+
+extern(C) nothrow
 {
     alias ImGuiAllocFunc = void* function(size_t sz, void* user_data);
 	alias ImGuiFreeFunc = void function(void* ptr, void* user_data);
 	alias ImGuiSizeCallback = void function(ImGuiSizeCallbackData* data);
 	alias ImGuiInputTextCallback = int function(ImGuiInputTextCallbackData *data);
 	alias ImDrawCallback = void function(const ImDrawList* parent_list,const ImDrawCmd* cmd);
-	alias GetClipboardTextFunc = const char* function(void* user_data);
+	alias GetClipboardTextFunc = const(char)* function(void* user_data);
 	alias SetClipboardTextFunc = void function(void* user_data,const char* text);
 	alias ImeSetInputScreenPosFunc = void function(int x,int y);
+
+	alias ImGuiItemGetter = bool function(void* data,int idx,const char** out_text);
+	alias ImGuiValuesGetter = float function(void* data,int idx);
 }
 
 extern(C) @nogc nothrow
 {
     alias da_igGetFrameHeight = float function();
-    alias da_igCreateContext = ImGuiContext* function(ImFontAtlas* shared_font_atlas=null);
-    alias da_igTextUnformatted = void function(const char* text,const char* text_end=null);
+    alias da_igCreateContext = ImGuiContext* function(ImFontAtlas* shared_font_atlas = null);
+    alias da_igTextUnformatted = void function(const char* text,const char* text_end = null);
     alias da_igPopFont = void function();
-    alias da_igCombo = bool function(const char* label,int* current_item,const char** items,int items_count,int popup_max_height_in_items=-1);
-    alias da_igCaptureKeyboardFromApp = void function(bool capture=true);
-    alias da_igIsWindowFocused = bool function(ImGuiFocusedFlags flags=0);
+    alias da_igCombo = bool function(const char* label,int* current_item,const char** items,int items_count,int popup_max_height_in_items = -1);
+    alias da_igComboStr = bool function(const char* label,int* current_item,const char* items_separated_by_zeros,int popup_max_height_in_items = -1);
+    alias da_igComboFnPtr = bool function(const char* label,int* current_item,ImGuiItemGetter getter,void* data,int items_count,int popup_max_height_in_items = -1);
+    alias da_igCaptureKeyboardFromApp = void function(bool capture = true);
+    alias da_igIsWindowFocused = bool function(ImGuiFocusedFlags flags = 0);
     alias da_igRender = void function();
-    alias da_ImDrawList_ChannelsSetCurrent = void function(int channel_index);
-    alias da_igDragFloat4 = bool function(const char* label,float[4] v,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format="%.3f",float power=1.0f);
-    alias da_ImDrawList_ChannelsSplit = void function(int channels_count);
-    alias da_igIsMousePosValid = bool function(const ImVec2* mouse_pos=null);
+    alias da_ImDrawList_ChannelsSetCurrent = void function(ImDrawList* self,int channel_index);
+    alias da_igDragFloat4 = bool function(const char* label,float[4] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
+    alias da_ImDrawList_ChannelsSplit = void function(ImDrawList* self,int channels_count);
+    alias da_igIsMousePosValid = bool function(const ImVec2* mouse_pos = null);
     alias da_igGetCursorScreenPos = ImVec2 function();
     alias da_igDebugCheckVersionAndDataLayout = bool function(const char* version_str,size_t sz_io,size_t sz_style,size_t sz_vec2,size_t sz_vec4,size_t sz_drawvert);
-    alias da_igSliderFloat4 = bool function(const char* label,float[4] v,float v_min,float v_max,const char* format="%.3f",float power=1.0f);
+    alias da_igSliderFloat4 = bool function(const char* label,float[4] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
     alias da_igSetScrollY = void function(float scroll_y);
+    alias da_CustomRect_destroy = void function(CustomRect* self);
     alias da_igGetStateStorage = ImGuiStorage* function();
     alias da_igSetColorEditOptions = void function(ImGuiColorEditFlags flags);
-    alias da_ImGuiStorage_GetBoolRef = bool* function(ImGuiID key,bool default_val=false);
-    alias da_igInputScalarN = bool function(const char* label,ImGuiDataType data_type,void* v,int components,const void* step=null,const void* step_fast=null,const char* format=null,ImGuiInputTextFlags extra_flags=0);
-    alias da_igColorPicker4 = bool function(const char* label,float[4] col,ImGuiColorEditFlags flags=0,const float* ref_col=null);
-    alias da_igSetScrollFromPosY = void function(float pos_y,float center_y_ratio=0.5f);
-    alias da_ImDrawList_Clear = void function();
-    alias da_igGetStyleColorVec4 = const ImVec4* function(ImGuiCol idx);
-    alias da_igGetClipboardText = const char* function();
-    alias da_igIsMouseHoveringRect = bool function(const ImVec2 r_min,const ImVec2 r_max,bool clip=true);
-    alias da_ImColor_SetHSV = void function(float h,float s,float v,float a=1.0f);
-    alias da_igDragFloat3 = bool function(const char* label,float[3] v,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format="%.3f",float power=1.0f);
-    alias da_ImDrawList_AddPolyline = void function(const ImVec2* points,const int num_points,ImU32 col,bool closed,float thickness);
-    alias da_igCalcTextSize = ImVec2 function(const char* text,const char* text_end=null,bool hide_text_after_double_hash=false,float wrap_width=-1.0f);
+    alias da_ImFontAtlas_destroy = void function(ImFontAtlas* self);
+    alias da_ImGuiStorage_GetBoolRef = bool* function(ImGuiStorage* self,ImGuiID key,bool default_val = false);
+    alias da_igInputScalarN = bool function(const char* label,ImGuiDataType data_type,void* v,int components,const void* step = null,const void* step_fast = null,const char* format = null,ImGuiInputTextFlags extra_flags = 0);
+    alias da_igColorPicker4 = bool function(const char* label,float[4] col,ImGuiColorEditFlags flags = 0,const float* ref_col = null);
+    alias da_ImGuiInputTextCallbackData_destroy = void function(ImGuiInputTextCallbackData* self);
+    alias da_igSetScrollFromPosY = void function(float pos_y,float center_y_ratio = 0.5f);
+    alias da_ImDrawCmd_destroy = void function(ImDrawCmd* self);
+    alias da_ImDrawList_Clear = void function(ImDrawList* self);
+    alias da_igGetStyleColorVec4 = const(ImVec4)* function(ImGuiCol idx);
+    alias da_igGetClipboardText = const(char)* function();
+    alias da_igIsMouseHoveringRect = bool function(const ImVec2 r_min,const ImVec2 r_max,bool clip = true);
+    alias da_ImVec4_ImVec4 = ImVec4* function();
+    alias da_ImVec4_ImVec4Float = ImVec4* function(float _x,float _y,float _z,float _w);
+    alias da_ImGuiPayload_destroy = void function(ImGuiPayload* self);
+    alias da_ImColor_SetHSV = void function(ImColor* self,float h,float s,float v,float a = 1.0f);
+    alias da_Pair_destroy = void function(Pair* self);
+    alias da_igDragFloat3 = bool function(const char* label,float[3] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
+    alias da_ImDrawList_AddPolyline = void function(ImDrawList* self,const ImVec2* points,const int num_points,ImU32 col,bool closed,float thickness);
+    alias da_ImGuiTextBuffer_destroy = void function(ImGuiTextBuffer* self);
+    alias da_igCalcTextSize = ImVec2 function(const char* text,const char* text_end = null,bool hide_text_after_double_hash = false,float wrap_width = -1.0f);
     alias da_igSetStateStorage = void function(ImGuiStorage* storage);
-    alias da_igValue = void function(const char* prefix,bool b);
-    alias da_igColumns = void function(int count=1,const char* id=null,bool border=true);
-    alias da_ImGuiTextFilter_Build = void function();
+    alias da_igValueBool = void function(const char* prefix,bool b);
+    alias da_igValueInt = void function(const char* prefix,int v);
+    alias da_igValueUint = void function(const char* prefix,uint v);
+    alias da_igValueFloat = void function(const char* prefix,float v,const char* float_format = null);
+    alias da_igColumns = void function(int count = 1,const char* id = null,bool border = true);
+    alias da_ImGuiTextFilter_Build = void function(ImGuiTextFilter* self);
+    alias da_ImGuiIO_destroy = void function(ImGuiIO* self);
     alias da_igGetItemRectMax = ImVec2 function();
+    alias da_ImGuiStyle_destroy = void function(ImGuiStyle* self);
     alias da_igIsItemDeactivated = bool function();
-    alias da_igPushStyleVar = void function(ImGuiStyleVar idx,float val);
-    alias da_igSaveIniSettingsToMemory = const char* function(size_t* out_ini_size=null);
-    alias da_ImGuiTextBuffer_size = int function();
-    alias da_igDragIntRange2 = bool function(const char* label,int* v_current_min,int* v_current_max,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format="%d",const char* format_max=null);
-    alias da_igUnindent = void function(float indent_w=0.0f);
-    alias da_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF = ImFont* function(const char* compressed_font_data_base85,float size_pixels,const ImFontConfig* font_cfg=null,const ImWchar* glyph_ranges=null);
+    alias da_igPushStyleVarFloat = void function(ImGuiStyleVar idx,float val);
+    alias da_igPushStyleVarVec2 = void function(ImGuiStyleVar idx,const ImVec2 val);
+    alias da_igSaveIniSettingsToMemory = const(char)* function(size_t* out_ini_size = null);
+    alias da_ImGuiTextBuffer_size = int function(ImGuiTextBuffer* self);
+    alias da_igDragIntRange2 = bool function(const char* label,int* v_current_min,int* v_current_max,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d",const char* format_max = null);
+    alias da_igUnindent = void function(float indent_w = 0.0f);
+    alias da_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF = ImFont* function(ImFontAtlas* self,const char* compressed_font_data_base85,float size_pixels,const ImFontConfig* font_cfg = null,const ImWchar* glyph_ranges = null);
     alias da_igPopAllowKeyboardFocus = void function();
     alias da_igLoadIniSettingsFromDisk = void function(const char* ini_filename);
+    alias da_ImVec2_destroy = void function(ImVec2* self);
     alias da_igGetCursorStartPos = ImVec2 function();
     alias da_igSetCursorScreenPos = void function(const ImVec2 screen_pos);
-    alias da_ImFont_AddRemapChar = void function(ImWchar dst,ImWchar src,bool overwrite_dst=true);
-    alias da_ImFont_AddGlyph = void function(ImWchar c,float x0,float y0,float x1,float y1,float u0,float v0,float u1,float v1,float advance_x);
-    alias da_igInputInt4 = bool function(const char* label,int[4] v,ImGuiInputTextFlags extra_flags=0);
-    alias da_ImFont_GrowIndex = void function(int new_size);
-    alias da_ImFont_RenderText = void function(ImDrawList* draw_list,float size,ImVec2 pos,ImU32 col,const ImVec4 clip_rect,const char* text_begin,const char* text_end,float wrap_width=0.0f,bool cpu_fine_clip=false);
+    alias da_ImFont_AddRemapChar = void function(ImFont* self,ImWchar dst,ImWchar src,bool overwrite_dst = true);
+    alias da_ImFont_AddGlyph = void function(ImFont* self,ImWchar c,float x0,float y0,float x1,float y1,float u0,float v0,float u1,float v1,float advance_x);
+    alias da_igInputInt4 = bool function(const char* label,int[4] v,ImGuiInputTextFlags extra_flags = 0);
+    alias da_ImFont_GrowIndex = void function(ImFont* self,int new_size);
+    alias da_ImFont_RenderText = void function(ImFont* self,ImDrawList* draw_list,float size,ImVec2 pos,ImU32 col,const ImVec4 clip_rect,const char* text_begin,const char* text_end,float wrap_width = 0.0f,bool cpu_fine_clip = false);
     alias da_igIsRectVisible = bool function(const ImVec2 size);
-    alias da_ImFontAtlas_Build = bool function();
+    alias da_igIsRectVisibleVec2 = bool function(const ImVec2 rect_min,const ImVec2 rect_max);
+    alias da_ImDrawList_destroy = void function(ImDrawList* self);
+    alias da_ImFontAtlas_Build = bool function(ImFontAtlas* self);
     alias da_igLabelText = void function(const char* label,const char* fmt,...);
-    alias da_ImFont_CalcWordWrapPositionA = const char* function(float scale,const char* text,const char* text_end,float wrap_width);
+    alias da_ImFont_CalcWordWrapPositionA = const(char)* function(ImFont* self,float scale,const char* text,const char* text_end,float wrap_width);
     alias da_igLogFinish = void function();
-    alias da_igIsKeyPressed = bool function(int user_key_index,bool repeat=true);
-    alias da_igGetColumnOffset = float function(int column_index=-1);
-    alias da_ImDrawList_PopClipRect = void function();
-    alias da_ImFont_CalcTextSizeA = ImVec2 function(float size,float max_width,float wrap_width,const char* text_begin,const char* text_end=null,const char** remaining=null);
-    alias da_igSetNextWindowCollapsed = void function(bool collapsed,ImGuiCond cond=0);
+    alias da_igIsKeyPressed = bool function(int user_key_index,bool repeat = true);
+    alias da_igGetColumnOffset = float function(int column_index = -1);
+    alias da_ImDrawList_PopClipRect = void function(ImDrawList* self);
+    alias da_ImFont_CalcTextSizeA = ImVec2 function(ImFont* self,float size,float max_width,float wrap_width,const char* text_begin,const char* text_end = null,const char** remaining = null);
+    alias da_igSetNextWindowCollapsed = void function(bool collapsed,ImGuiCond cond = 0);
     alias da_igGetCurrentContext = ImGuiContext* function();
     alias da_igSmallButton = bool function(const char* label);
-    alias da_igOpenPopupOnItemClick = bool function(const char* str_id=null,int mouse_button=1);
+    alias da_igOpenPopupOnItemClick = bool function(const char* str_id = null,int mouse_button = 1);
     alias da_igIsAnyMouseDown = bool function();
-    alias da_ImFont_IsLoaded = bool function();
-    alias da_ImFont_GetCharAdvance = float function(ImWchar c);
-    alias da_ImFont_SetFallbackChar = void function(ImWchar c);
-    alias da_ImFont_FindGlyphNoFallback = const ImFontGlyph* function(ImWchar c);
-    alias da_igImageButton = bool function(ImTextureID user_texture_id,const ImVec2 size,const ImVec2 uv0=ImVec2(0,0),const ImVec2 uv1=ImVec2(1,1),int frame_padding=-1,const ImVec4 bg_col=ImVec4(0,0,0,0),const ImVec4 tint_col=ImVec4(1,1,1,1));
-    alias da_ImFont_FindGlyph = const ImFontGlyph* function(ImWchar c);
+    alias da_GlyphRangesBuilder_GlyphRangesBuilder = GlyphRangesBuilder* function();
+    alias da_ImFont_IsLoaded = bool function(ImFont* self);
+    alias da_ImFont_GetCharAdvance = float function(ImFont* self,ImWchar c);
+    alias da_ImFont_SetFallbackChar = void function(ImFont* self,ImWchar c);
+    alias da_ImFont_FindGlyphNoFallback = const(ImFontGlyph)* function(ImFont* self,ImWchar c);
+    alias da_igImageButton = bool function(ImTextureID user_texture_id,const ImVec2 size,const ImVec2 uv0 = ImVec2(0,0),const ImVec2 uv1 = ImVec2(1,1),int frame_padding = -1,const ImVec4 bg_col = ImVec4(0,0,0,0),const ImVec4 tint_col = ImVec4(1,1,1,1));
+    alias da_ImFont_FindGlyph = const(ImFontGlyph)* function(ImFont* self,ImWchar c);
     alias da_igEndFrame = void function();
-    alias da_igSliderFloat2 = bool function(const char* label,float[2] v,float v_min,float v_max,const char* format="%.3f",float power=1.0f);
-    alias da_ImFont_RenderChar = void function(ImDrawList* draw_list,float size,ImVec2 pos,ImU32 col,ImWchar c);
-    alias da_igRadioButton = bool function(const char* label,bool active);
-    alias da_ImDrawList_PushClipRect = void function(ImVec2 clip_rect_min,ImVec2 clip_rect_max,bool intersect_with_current_clip_rect=false);
-    alias da_igLoadIniSettingsFromMemory = void function(const char* ini_data,size_t ini_size=0);
+    alias da_igSliderFloat2 = bool function(const char* label,float[2] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
+    alias da_ImFont_RenderChar = void function(ImFont* self,ImDrawList* draw_list,float size,ImVec2 pos,ImU32 col,ImWchar c);
+    alias da_igRadioButtonBool = bool function(const char* label,bool active);
+    alias da_igRadioButtonIntPtr = bool function(const char* label,int* v,int v_button);
+    alias da_ImDrawList_PushClipRect = void function(ImDrawList* self,ImVec2 clip_rect_min,ImVec2 clip_rect_max,bool intersect_with_current_clip_rect = false);
+    alias da_igLoadIniSettingsFromMemory = void function(const char* ini_data,size_t ini_size = 0);
     alias da_igIsItemDeactivatedAfterEdit = bool function();
     alias da_igGetWindowDrawList = ImDrawList* function();
-    alias da_ImDrawList_PathBezierCurveTo = void function(const ImVec2 p1,const ImVec2 p2,const ImVec2 p3,int num_segments=0);
-    alias da_ImGuiPayload_Clear = void function();
+    alias da_ImDrawList_PathBezierCurveTo = void function(ImDrawList* self,const ImVec2 p1,const ImVec2 p2,const ImVec2 p3,int num_segments = 0);
+    alias da_ImGuiPayload_Clear = void function(ImGuiPayload* self);
     alias da_igNewLine = void function();
     alias da_igIsItemFocused = bool function();
-    alias da_igSliderInt2 = bool function(const char* label,int[2] v,int v_min,int v_max,const char* format="%d");
-    alias da_ImGuiStorage_SetAllInt = void function(int val);
-    alias da_igSetWindowSize = void function(const ImVec2 size,ImGuiCond cond=0);
-    alias da_igInputFloat = bool function(const char* label,float* v,float step=0.0f,float step_fast=0.0f,const char* format="%.3f",ImGuiInputTextFlags extra_flags=0);
-    alias da_ImFontAtlas_CalcCustomRectUV = void function(const CustomRect* rect,ImVec2* out_uv_min,ImVec2* out_uv_max);
-    alias da_ImFontAtlas_GetCustomRectByIndex = const CustomRect* function(int index);
-    alias da_igColorConvertRGBtoHSV = void function(float r,float g,float b,float out_h,float out_s,float out_v);
+    alias da_ImFont_ImFont = ImFont* function();
+    alias da_igSliderInt2 = bool function(const char* label,int[2] v,int v_min,int v_max,const char* format = "%d");
+    alias da_ImGuiStorage_SetAllInt = void function(ImGuiStorage* self,int val);
+    alias da_igSetWindowSizeVec2 = void function(const ImVec2 size,ImGuiCond cond = 0);
+    alias da_igSetWindowSizeStr = void function(const char* name,const ImVec2 size,ImGuiCond cond = 0);
+    alias da_igInputFloat = bool function(const char* label,float* v,float step = 0.0f,float step_fast = 0.0f,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
+    alias da_ImFontAtlas_CalcCustomRectUV = void function(ImFontAtlas* self,const CustomRect* rect,ImVec2* out_uv_min,ImVec2* out_uv_max);
+    alias da_ImFontAtlas_GetCustomRectByIndex = const(CustomRect)* function(ImFontAtlas* self,int index);
+    alias da_igColorConvertRGBtoHSV = void function(float r,float g,float b,float* out_h,float* out_s,float* out_v);
     alias da_igBeginMenuBar = bool function();
     alias da_igTextColoredV = void function(const ImVec4 col,const char* fmt,va_list args);
     alias da_igIsPopupOpen = bool function(const char* str_id);
     alias da_igIsItemVisible = bool function();
     alias da_igGetWindowContentRegionMax = ImVec2 function();
     alias da_igTextWrappedV = void function(const char* fmt,va_list args);
-    alias da_ImFontAtlas_AddCustomRectRegular = int function(uint id,int width,int height);
-    alias da_GlyphRangesBuilder_AddText = void function(const char* text,const char* text_end=null);
-    alias da_ImDrawList_UpdateTextureID = void function();
-    alias da_CustomRect_IsPacked = bool function();
-    alias da_ImGuiInputTextCallbackData_HasSelection = bool function();
-    alias da_igSetWindowCollapsed = void function(bool collapsed,ImGuiCond cond=0);
-    alias da_igGetMouseDragDelta = ImVec2 function(int button=0,float lock_threshold=-1.0f);
-    alias da_igAcceptDragDropPayload = const ImGuiPayload* function(const char* type,ImGuiDragDropFlags flags=0);
-    alias da_igBeginDragDropSource = bool function(ImGuiDragDropFlags flags=0);
-    alias da_ImDrawList_AddCallback = void function(ImDrawCallback callback,void* callback_data);
-    alias da_igPlotLines = void function(const char* label,const float* values,int values_count,int values_offset=0,const char* overlay_text=null,float scale_min=3.40282346638528859812e+38F,float scale_max=3.40282346638528859812e+38F,ImVec2 graph_size=ImVec2(0,0),int stride=4);
-    alias da_ImFontAtlas_IsBuilt = bool function();
+    alias da_ImFontAtlas_AddCustomRectRegular = int function(ImFontAtlas* self,uint id,int width,int height);
+    alias da_GlyphRangesBuilder_AddText = void function(GlyphRangesBuilder* self,const char* text,const char* text_end = null);
+    alias da_ImDrawList_UpdateTextureID = void function(ImDrawList* self);
+    alias da_CustomRect_IsPacked = bool function(CustomRect* self);
+    alias da_ImGuiInputTextCallbackData_HasSelection = bool function(ImGuiInputTextCallbackData* self);
+    alias da_igSetWindowCollapsedBool = void function(bool collapsed,ImGuiCond cond = 0);
+    alias da_igSetWindowCollapsedStr = void function(const char* name,bool collapsed,ImGuiCond cond = 0);
+    alias da_igGetMouseDragDelta = ImVec2 function(int button = 0,float lock_threshold = -1.0f);
+    alias da_igAcceptDragDropPayload = const(ImGuiPayload)* function(const char* type,ImGuiDragDropFlags flags = 0);
+    alias da_igBeginDragDropSource = bool function(ImGuiDragDropFlags flags = 0);
+    alias da_ImDrawList_AddCallback = void function(ImDrawList* self,ImDrawCallback callback,void* callback_data);
+    alias da_igPlotLines = void function(const char* label,const float* values,int values_count,int values_offset = 0,const char* overlay_text = null,float scale_min = float.max,float scale_max = float.max,ImVec2 graph_size = ImVec2(0,0),int stride = float.sizeof);
+    alias da_igPlotLinesFnPtr = void function(const char* label,ImGuiValuesGetter getter,void* data,int values_count,int values_offset = 0,const char* overlay_text = null,float scale_min = float.max,float scale_max = float.max,ImVec2 graph_size = ImVec2(0,0));
+    alias da_ImFontAtlas_IsBuilt = bool function(ImFontAtlas* self);
     alias da_igTextWrapped = void function(const char* fmt,...);
-    alias da_GlyphRangesBuilder_AddRanges = void function(const ImWchar* ranges);
+    alias da_GlyphRangesBuilder_AddRanges = void function(GlyphRangesBuilder* self,const ImWchar* ranges);
     alias da_igGetFrameCount = int function();
-    alias da_GlyphRangesBuilder_SetBit = void function(int n);
-    alias da_ImDrawList_PathFillConvex = void function(ImU32 col);
-    alias da_ImFont_GetDebugName = const char* function();
-    alias da_igListBoxHeader = bool function(const char* label,const ImVec2 size=ImVec2(0,0));
+    alias da_GlyphRangesBuilder_SetBit = void function(GlyphRangesBuilder* self,int n);
+    alias da_ImDrawList_PathFillConvex = void function(ImDrawList* self,ImU32 col);
+    alias da_ImFont_GetDebugName = const(char)* function(ImFont* self);
+    alias da_igListBoxHeaderVec2 = bool function(const char* label,const ImVec2 size = ImVec2(0,0));
+    alias da_igListBoxHeaderInt = bool function(const char* label,int items_count,int height_in_items = -1);
     alias da_igPopClipRect = void function();
-    alias da_ImFontAtlas_GetGlyphRangesThai = const ImWchar* function();
-    alias da_ImFontAtlas_GetGlyphRangesCyrillic = const ImWchar* function();
+    alias da_ImFontAtlas_GetGlyphRangesThai = const(ImWchar)* function(ImFontAtlas* self);
+    alias da_ImFontAtlas_GetGlyphRangesCyrillic = const(ImWchar)* function(ImFontAtlas* self);
     alias da_igGetWindowSize = ImVec2 function();
-    alias da_ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon = const ImWchar* function();
+    alias da_ImFontAtlas_GetGlyphRangesChineseSimplifiedCommon = const(ImWchar)* function(ImFontAtlas* self);
     alias da_igCheckboxFlags = bool function(const char* label,uint* flags,uint flags_value);
-    alias da_ImFontAtlas_GetGlyphRangesChineseFull = const ImWchar* function();
-    alias da_igIsWindowHovered = bool function(ImGuiHoveredFlags flags=0);
-    alias da_igPlotHistogram = void function(const char* label,const float* values,int values_count,int values_offset=0,const char* overlay_text=null,float scale_min=3.40282346638528859812e+38F,float scale_max=3.40282346638528859812e+38F,ImVec2 graph_size=ImVec2(0,0),int stride=4);
-    alias da_igBeginPopupContextVoid = bool function(const char* str_id=null,int mouse_button=1);
-    alias da_igShowStyleEditor = void function(ImGuiStyle* ref_=null);
+    alias da_ImFontAtlas_GetGlyphRangesChineseFull = const(ImWchar)* function(ImFontAtlas* self);
+    alias da_igIsWindowHovered = bool function(ImGuiHoveredFlags flags = 0);
+    alias da_ImFontConfig_ImFontConfig = ImFontConfig* function();
+    alias da_igPlotHistogramFloatPtr = void function(const char* label,const float* values,int values_count,int values_offset = 0,const char* overlay_text = null,float scale_min = float.max,float scale_max = float.max,ImVec2 graph_size = ImVec2(0,0),int stride = float.sizeof);
+    alias da_igPlotHistogramFnPtr = void function(const char* label,ImGuiValuesGetter getter,void* data,int values_count,int values_offset = 0,const char* overlay_text = null,float scale_min = float.max,float scale_max = float.max,ImVec2 graph_size = ImVec2(0,0));
+    alias da_igBeginPopupContextVoid = bool function(const char* str_id = null,int mouse_button = 1);
+    alias da_igShowStyleEditor = void function(ImGuiStyle* ref_);
     alias da_igShowUserGuide = void function();
     alias da_igCheckbox = bool function(const char* label,bool* v);
     alias da_igGetWindowPos = ImVec2 function();
-    alias da_ImFontAtlas_GetGlyphRangesDefault = const ImWchar* function();
-    alias da_ImFontAtlas_SetTexID = void function(ImTextureID id);
+    alias da_ImFontAtlas_GetGlyphRangesDefault = const(ImWchar)* function(ImFontAtlas* self);
+    alias da_ImGuiInputTextCallbackData_ImGuiInputTextCallbackData = ImGuiInputTextCallbackData* function();
+    alias da_ImFontAtlas_SetTexID = void function(ImFontAtlas* self,ImTextureID id);
     alias da_igTextColored = void function(const ImVec4 col,const char* fmt,...);
-    alias da_igLogToFile = void function(int max_depth=-1,const char* filename=null);
-    alias da_igButton = bool function(const char* label,const ImVec2 size=ImVec2(0,0));
+    alias da_igLogToFile = void function(int max_depth = -1,const char* filename = null);
+    alias da_igButton = bool function(const char* label,const ImVec2 size = ImVec2(0,0));
     alias da_igIsItemEdited = bool function();
-    alias da_igTreeNodeExV = bool function(const char* str_id,ImGuiTreeNodeFlags flags,const char* fmt,va_list args);
-    alias da_ImDrawList_PushTextureID = void function(ImTextureID texture_id);
+    alias da_igTreeNodeExVStr = bool function(const char* str_id,ImGuiTreeNodeFlags flags,const char* fmt,va_list args);
+    alias da_igTreeNodeExVPtr = bool function(const void* ptr_id,ImGuiTreeNodeFlags flags,const char* fmt,va_list args);
+    alias da_ImDrawList_PushTextureID = void function(ImDrawList* self,ImTextureID texture_id);
     alias da_igTreeAdvanceToLabelPos = void function();
-    alias da_ImGuiInputTextCallbackData_DeleteChars = void function(int pos,int bytes_count);
-    alias da_igDragInt2 = bool function(const char* label,int[2] v,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format="%d");
+    alias da_ImGuiInputTextCallbackData_DeleteChars = void function(ImGuiInputTextCallbackData* self,int pos,int bytes_count);
+    alias da_igDragInt2 = bool function(const char* label,int[2] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
     alias da_igArrowButton = bool function(const char* str_id,ImGuiDir dir);
     alias da_igIsAnyItemActive = bool function();
-    alias da_ImDrawList_AddBezierCurve = void function(const ImVec2 pos0,const ImVec2 cp0,const ImVec2 cp1,const ImVec2 pos1,ImU32 col,float thickness,int num_segments=0);
-    alias da_ImFontAtlas_AddFontFromMemoryCompressedTTF = ImFont* function(const void* compressed_font_data,int compressed_font_size,float size_pixels,const ImFontConfig* font_cfg=null,const ImWchar* glyph_ranges=null);
-    alias da_ImFontAtlas_ClearFonts = void function();
+    alias da_ImDrawList_AddBezierCurve = void function(ImDrawList* self,const ImVec2 pos0,const ImVec2 cp0,const ImVec2 cp1,const ImVec2 pos1,ImU32 col,float thickness,int num_segments = 0);
+    alias da_ImFontAtlas_AddFontFromMemoryCompressedTTF = ImFont* function(ImFontAtlas* self,const void* compressed_font_data,int compressed_font_size,float size_pixels,const ImFontConfig* font_cfg = null,const ImWchar* glyph_ranges = null);
+    alias da_ImFontAtlas_ClearFonts = void function(ImFontAtlas* self);
     alias da_igDummy = void function(const ImVec2 size);
-    alias da_ImFontAtlas_ClearTexData = void function();
+    alias da_ImFontAtlas_ClearTexData = void function(ImFontAtlas* self);
+    alias da_TextRange_destroy = void function(TextRange* self);
     alias da_igGetColumnsCount = int function();
     alias da_igPopButtonRepeat = void function();
-    alias da_igDragScalarN = bool function(const char* label,ImGuiDataType data_type,void* v,int components,float v_speed,const void* v_min=null,const void* v_max=null,const char* format=null,float power=1.0f);
-    alias da_ImGuiPayload_IsPreview = bool function();
+    alias da_igDragScalarN = bool function(const char* label,ImGuiDataType data_type,void* v,int components,float v_speed,const void* v_min = null,const void* v_max = null,const char* format = null,float power = 1.0f);
+    alias da_ImGuiPayload_IsPreview = bool function(ImGuiPayload* self);
     alias da_igSpacing = void function();
-    alias da_ImFontAtlas_Clear = void function();
+    alias da_ImFontAtlas_Clear = void function(ImFontAtlas* self);
     alias da_igIsAnyItemFocused = bool function();
-    alias da_ImFontAtlas_AddFontFromMemoryTTF = ImFont* function(void* font_data,int font_size,float size_pixels,const ImFontConfig* font_cfg=null,const ImWchar* glyph_ranges=null);
-    alias da_ImFontAtlas_AddFontFromFileTTF = ImFont* function(const char* filename,float size_pixels,const ImFontConfig* font_cfg=null,const ImWchar* glyph_ranges=null);
+    alias da_ImFontAtlas_AddFontFromMemoryTTF = ImFont* function(ImFontAtlas* self,void* font_data,int font_size,float size_pixels,const ImFontConfig* font_cfg = null,const ImWchar* glyph_ranges = null);
+    alias da_ImFontAtlas_AddFontFromFileTTF = ImFont* function(ImFontAtlas* self,const char* filename,float size_pixels,const ImFontConfig* font_cfg = null,const ImWchar* glyph_ranges = null);
     alias da_igMemFree = void function(void* ptr);
     alias da_igGetFontTexUvWhitePixel = ImVec2 function();
-    alias da_ImDrawList_AddDrawCmd = void function();
-    alias da_igIsItemClicked = bool function(int mouse_button=0);
-    alias da_ImFontAtlas_AddFontDefault = ImFont* function(const ImFontConfig* font_cfg=null);
-    alias da_ImFontAtlas_AddFont = ImFont* function(const ImFontConfig* font_cfg);
-    alias da_igProgressBar = void function(float fraction,const ImVec2 size_arg=ImVec2(-1,0),const char* overlay=null);
+    alias da_ImDrawList_AddDrawCmd = void function(ImDrawList* self);
+    alias da_igIsItemClicked = bool function(int mouse_button = 0);
+    alias da_ImFontAtlas_AddFontDefault = ImFont* function(ImFontAtlas* self,const ImFontConfig* font_cfg = null);
+    alias da_ImFontAtlas_AddFont = ImFont* function(ImFontAtlas* self,const ImFontConfig* font_cfg);
+    alias da_igProgressBar = void function(float fraction,const ImVec2 size_arg = ImVec2(-1,0),const char* overlay = null);
     alias da_igSetNextWindowBgAlpha = void function(float alpha);
-    alias da_igBeginPopup = bool function(const char* str_id,ImGuiWindowFlags flags=0);
-    alias da_ImFont_BuildLookupTable = void function();
+    alias da_igBeginPopup = bool function(const char* str_id,ImGuiWindowFlags flags = 0);
+    alias da_ImFont_BuildLookupTable = void function(ImFont* self);
     alias da_igGetScrollX = float function();
     alias da_igGetKeyIndex = int function(ImGuiKey imgui_key);
     alias da_igGetOverlayDrawList = ImDrawList* function();
-    alias da_igGetID = ImGuiID function(const char* str_id);
-    alias da_ImFontAtlas_GetGlyphRangesJapanese = const ImWchar* function();
-    alias da_ImDrawData_ScaleClipRects = void function(const ImVec2 sc);
-    alias da_ImDrawData_DeIndexAllBuffers = void function();
+    alias da_igGetIDStr = ImGuiID function(const char* str_id);
+    alias da_igGetIDRange = ImGuiID function(const char* str_id_begin,const char* str_id_end);
+    alias da_igGetIDPtr = ImGuiID function(const void* ptr_id);
+    alias da_ImFontAtlas_GetGlyphRangesJapanese = const(ImWchar)* function(ImFontAtlas* self);
+    alias da_ImDrawData_ScaleClipRects = void function(ImDrawData* self,const ImVec2 sc);
+    alias da_ImDrawData_DeIndexAllBuffers = void function(ImDrawData* self);
     alias da_igIsMouseReleased = bool function(int button);
-    alias da_ImDrawData_Clear = void function();
+    alias da_ImDrawData_Clear = void function(ImDrawData* self);
     alias da_igGetItemRectMin = ImVec2 function();
     alias da_igLogText = void function(const char* fmt,...);
-    alias da_igSetNextWindowSizeConstraints = void function(const ImVec2 size_min,const ImVec2 size_max,ImGuiSizeCallback custom_callback=null,void* custom_callback_data=null);
-    alias da_ImGuiStorage_GetVoidPtr = void* function(ImGuiID key);
-    alias da_ImDrawList_UpdateClipRect = void function();
-    alias da_ImDrawList_PrimVtx = void function(const ImVec2 pos,const ImVec2 uv,ImU32 col);
-    alias da_igGetColorU32 = ImU32 function(ImGuiCol idx,float alpha_mul=1.0f);
-    alias da_igVSliderInt = bool function(const char* label,const ImVec2 size,int* v,int v_min,int v_max,const char* format="%d");
+    alias da_igSetNextWindowSizeConstraints = void function(const ImVec2 size_min,const ImVec2 size_max,ImGuiSizeCallback custom_callback = null,void* custom_callback_data = null);
+    alias da_ImGuiStorage_GetVoidPtr = void* function(ImGuiStorage* self,ImGuiID key);
+    alias da_ImDrawList_UpdateClipRect = void function(ImDrawList* self);
+    alias da_ImDrawList_PrimVtx = void function(ImDrawList* self,const ImVec2 pos,const ImVec2 uv,ImU32 col);
+    alias da_igGetColorU32 = ImU32 function(ImGuiCol idx,float alpha_mul = 1.0f);
+    alias da_igGetColorU32Vec4 = ImU32 function(const ImVec4 col);
+    alias da_igGetColorU32U32 = ImU32 function(ImU32 col);
+    alias da_igVSliderInt = bool function(const char* label,const ImVec2 size,int* v,int v_min,int v_max,const char* format = "%d");
     alias da_igInvisibleButton = bool function(const char* str_id,const ImVec2 size);
-    alias da_igInputInt2 = bool function(const char* label,int[2] v,ImGuiInputTextFlags extra_flags=0);
-    alias da_ImDrawList_PrimRect = void function(const ImVec2 a,const ImVec2 b,ImU32 col);
-    alias da_ImDrawList_AddRectFilled = void function(const ImVec2 a,const ImVec2 b,ImU32 col,float rounding=0.0f,int rounding_corners_flags=ImDrawCornerFlags_All);
-    alias da_ImDrawList_ClearFreeMemory = void function();
-    alias da_ImDrawList_CloneOutput = ImDrawList* function();
-    alias da_igSetNextTreeNodeOpen = void function(bool is_open,ImGuiCond cond=0);
-    alias da_igLogToTTY = void function(int max_depth=-1);
+    alias da_igInputInt2 = bool function(const char* label,int[2] v,ImGuiInputTextFlags extra_flags = 0);
+    alias da_ImDrawList_PrimRect = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,ImU32 col);
+    alias da_ImDrawList_AddRectFilled = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,ImU32 col,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All);
+    alias da_ImDrawList_ClearFreeMemory = void function(ImDrawList* self);
+    alias da_ImGuiListClipper_destroy = void function(ImGuiListClipper* self);
+    alias da_ImDrawList_CloneOutput = ImDrawList* function(ImDrawList* self);
+    alias da_igSetNextTreeNodeOpen = void function(bool is_open,ImGuiCond cond = 0);
+    alias da_igLogToTTY = void function(int max_depth = -1);
+    alias da_GlyphRangesBuilder_BuildRanges = void function(GlyphRangesBuilder* self,ImVector_ImWchar* out_ranges);
     alias da_igSetTooltipV = void function(const char* fmt,va_list args);
     alias da_igEndGroup = void function();
     alias da_igGetIO = ImGuiIO* function();
-    alias da_igDragInt4 = bool function(const char* label,int[4] v,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format="%d");
+    alias da_igDragInt4 = bool function(const char* label,int[4] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
     alias da_igNextColumn = void function();
-    alias da_ImDrawList_AddRect = void function(const ImVec2 a,const ImVec2 b,ImU32 col,float rounding=0.0f,int rounding_corners_flags=ImDrawCornerFlags_All,float thickness=1.0f);
+    alias da_ImDrawList_AddRect = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,ImU32 col,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All,float thickness = 1.0f);
+    alias da_TextRange_split = void function(TextRange* self,char separator,ImVector_TextRange* out_);
     alias da_igSetCursorPos = void function(const ImVec2 local_pos);
-    alias da_igBeginPopupModal = bool function(const char* name,bool* p_open=null,ImGuiWindowFlags flags=0);
-    alias da_igSliderInt4 = bool function(const char* label,int[4] v,int v_min,int v_max,const char* format="%d");
-    alias da_ImDrawList_PathRect = void function(const ImVec2 rect_min,const ImVec2 rect_max,float rounding=0.0f,int rounding_corners_flags=ImDrawCornerFlags_All);
-    alias da_igShowMetricsWindow = void function(bool* p_open=null);
+    alias da_igBeginPopupModal = bool function(const char* name,bool* p_open = null,ImGuiWindowFlags flags = 0);
+    alias da_igSliderInt4 = bool function(const char* label,int[4] v,int v_min,int v_max,const char* format = "%d");
+    alias da_ImDrawList_PathRect = void function(ImDrawList* self,const ImVec2 rect_min,const ImVec2 rect_max,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All);
+    alias da_igShowMetricsWindow = void function(bool* p_open = null);
     alias da_igGetScrollMaxY = float function();
     alias da_igBeginTooltip = void function();
-    alias da_ImDrawList_PathArcToFast = void function(const ImVec2 centre,float radius,int a_min_of_12,int a_max_of_12);
+    alias da_ImDrawList_PathArcToFast = void function(ImDrawList* self,const ImVec2 centre,float radius,int a_min_of_12,int a_max_of_12);
     alias da_igGetDrawData = ImDrawData* function();
     alias da_igGetTextLineHeight = float function();
     alias da_igSeparator = void function();
-    alias da_igBeginChild = bool function(const char* str_id,const ImVec2 size=ImVec2(0,0),bool border=false,ImGuiWindowFlags flags=0);
+    alias da_igBeginChild = bool function(const char* str_id,const ImVec2 size = ImVec2(0,0),bool border = false,ImGuiWindowFlags flags = 0);
+    alias da_igBeginChildID = bool function(ImGuiID id,const ImVec2 size = ImVec2(0,0),bool border = false,ImGuiWindowFlags flags = 0);
     alias da_igIsWindowAppearing = bool function();
-    alias da_igIsMouseClicked = bool function(int button,bool repeat=false);
+    alias da_igIsMouseClicked = bool function(int button,bool repeat = false);
     alias da_igCalcItemWidth = float function();
-    alias da_ImGuiTextBuffer_appendfv = void function(const char* fmt,va_list args);
-    alias da_ImDrawList_PathStroke = void function(ImU32 col,bool closed,float thickness=1.0f);
+    alias da_ImGuiTextBuffer_appendfv = void function(ImGuiTextBuffer* self,const char* fmt,va_list args);
+    alias da_ImDrawList_PathStroke = void function(ImDrawList* self,ImU32 col,bool closed,float thickness = 1.0f);
     alias da_igEndChildFrame = void function();
-    alias da_igIndent = void function(float indent_w=0.0f);
-    alias da_igSetDragDropPayload = bool function(const char* type,const void* data,size_t size,ImGuiCond cond=0);
-    alias da_GlyphRangesBuilder_GetBit = bool function(int n);
-    alias da_igSetScrollHereY = void function(float center_y_ratio=0.5f);
-    alias da_igShowDemoWindow = void function(bool* p_open=null);
-    alias da_ImDrawList_PathLineToMergeDuplicate = void function(const ImVec2 pos);
+    alias da_igIndent = void function(float indent_w = 0.0f);
+    alias da_igSetDragDropPayload = bool function(const char* type,const void* data,size_t size,ImGuiCond cond = 0);
+    alias da_GlyphRangesBuilder_GetBit = bool function(GlyphRangesBuilder* self,int n);
+    alias da_igSetScrollHereY = void function(float center_y_ratio = 0.5f);
+    alias da_igShowDemoWindow = void function(bool* p_open = null);
+    alias da_ImDrawList_PathLineToMergeDuplicate = void function(ImDrawList* self,const ImVec2 pos);
     alias da_igSetScrollX = void function(float scroll_x);
     alias da_igIsKeyReleased = bool function(int user_key_index);
     alias da_igEndMenu = void function();
-    alias da_igColorButton = bool function(const char* desc_id,const ImVec4 col,ImGuiColorEditFlags flags=0,ImVec2 size=ImVec2(0,0));
-    alias da_ImFontAtlas_GetTexDataAsAlpha8 = void function(char** out_pixels,int* out_width,int* out_height,int* out_bytes_per_pixel=null);
-    alias da_ImDrawList_AddConvexPolyFilled = void function(const ImVec2* points,const int num_points,ImU32 col);
+    alias da_igColorButton = bool function(const char* desc_id,const ImVec4 col,ImGuiColorEditFlags flags = 0,ImVec2 size = ImVec2(0,0));
+    alias da_ImFontAtlas_GetTexDataAsAlpha8 = void function(ImFontAtlas* self,char** out_pixels,int* out_width,int* out_height,int* out_bytes_per_pixel = null);
+    alias da_ImDrawList_AddConvexPolyFilled = void function(ImDrawList* self,const ImVec2* points,const int num_points,ImU32 col);
     alias da_igSetClipboardText = void function(const char* text);
-    alias da_ImDrawList_PathArcTo = void function(const ImVec2 centre,float radius,float a_min,float a_max,int num_segments=10);
-    alias da_ImDrawList_AddImageQuad = void function(ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,const ImVec2 uv_a=ImVec2(0,0),const ImVec2 uv_b=ImVec2(1,0),const ImVec2 uv_c=ImVec2(1,1),const ImVec2 uv_d=ImVec2(0,1),ImU32 col=0xFFFFFFFF);
+    alias da_ImDrawList_PathArcTo = void function(ImDrawList* self,const ImVec2 centre,float radius,float a_min,float a_max,int num_segments = 10);
+    alias da_ImDrawList_AddImageQuad = void function(ImDrawList* self,ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,const ImVec2 uv_a = ImVec2(0,0),const ImVec2 uv_b = ImVec2(1,0),const ImVec2 uv_c = ImVec2(1,1),const ImVec2 uv_d = ImVec2(0,1),ImU32 col = 0xFFFFFFFF);
     alias da_igIsWindowCollapsed = bool function();
-    alias da_ImDrawList_AddImage = void function(ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 uv_a=ImVec2(0,0),const ImVec2 uv_b=ImVec2(1,1),ImU32 col=0xFFFFFFFF);
-    alias da_ImDrawList_AddText = void function(const ImVec2 pos,ImU32 col,const char* text_begin,const char* text_end=null);
+    alias da_ImDrawList_AddImage = void function(ImDrawList* self,ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 uv_a = ImVec2(0,0),const ImVec2 uv_b = ImVec2(1,1),ImU32 col = 0xFFFFFFFF);
+    alias da_ImDrawList_AddText = void function(ImDrawList* self,const ImVec2 pos,ImU32 col,const char* text_begin,const char* text_end = null);
+    alias da_ImDrawList_AddTextFontPtr = void function(ImDrawList* self,const ImFont* font,float font_size,const ImVec2 pos,ImU32 col,const char* text_begin,const char* text_end = null,float wrap_width = 0.0f,const ImVec4* cpu_fine_clip_rect = null);
     alias da_igSetNextWindowFocus = void function();
-    alias da_igSameLine = void function(float pos_x=0.0f,float spacing_w=-1.0f);
-    alias da_igBegin = bool function(const char* name,bool* p_open=null,ImGuiWindowFlags flags=0);
-    alias da_igColorEdit3 = bool function(const char* label,float[3] col,ImGuiColorEditFlags flags=0);
-    alias da_ImDrawList_AddCircleFilled = void function(const ImVec2 centre,float radius,ImU32 col,int num_segments=12);
-    alias da_ImGuiIO_AddInputCharactersUTF8 = void function(const char* utf8_chars);
-    alias da_ImDrawList_AddCircle = void function(const ImVec2 centre,float radius,ImU32 col,int num_segments=12,float thickness=1.0f);
-    alias da_ImDrawList_AddTriangleFilled = void function(const ImVec2 a,const ImVec2 b,const ImVec2 c,ImU32 col);
-    alias da_igDragFloat2 = bool function(const char* label,float[2] v,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format="%.3f",float power=1.0f);
+    alias da_igSameLine = void function(float pos_x = 0.0f,float spacing_w = -1.0f);
+    alias da_igBegin = bool function(const char* name,bool* p_open = null,ImGuiWindowFlags flags = 0);
+    alias da_igColorEdit3 = bool function(const char* label,float[3] col,ImGuiColorEditFlags flags = 0);
+    alias da_ImDrawList_AddCircleFilled = void function(ImDrawList* self,const ImVec2 centre,float radius,ImU32 col,int num_segments = 12);
+    alias da_ImGuiIO_AddInputCharactersUTF8 = void function(ImGuiIO* self,const char* utf8_chars);
+    alias da_ImDrawList_AddCircle = void function(ImDrawList* self,const ImVec2 centre,float radius,ImU32 col,int num_segments = 12,float thickness = 1.0f);
+    alias da_ImDrawList_AddTriangleFilled = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 c,ImU32 col);
+    alias da_igDragFloat2 = bool function(const char* label,float[2] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
     alias da_igPushButtonRepeat = void function(bool repeat);
     alias da_igPopItemWidth = void function();
-    alias da_ImDrawList_AddTriangle = void function(const ImVec2 a,const ImVec2 b,const ImVec2 c,ImU32 col,float thickness=1.0f);
-    alias da_ImDrawList_AddQuadFilled = void function(const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,ImU32 col);
-    alias da_ImDrawList_AddQuad = void function(const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,ImU32 col,float thickness=1.0f);
-    alias da_ImDrawList_AddRectFilledMultiColor = void function(const ImVec2 a,const ImVec2 b,ImU32 col_upr_left,ImU32 col_upr_right,ImU32 col_bot_right,ImU32 col_bot_left);
+    alias da_ImDrawList_AddTriangle = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 c,ImU32 col,float thickness = 1.0f);
+    alias da_ImDrawList_AddQuadFilled = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,ImU32 col);
+    alias da_ImDrawList_AddQuad = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,ImU32 col,float thickness = 1.0f);
+    alias da_ImDrawList_AddRectFilledMultiColor = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,ImU32 col_upr_left,ImU32 col_upr_right,ImU32 col_bot_right,ImU32 col_bot_left);
     alias da_igGetFontSize = float function();
-    alias da_igInputDouble = bool function(const char* label,double* v,double step=0.0f,double step_fast=0.0f,const char* format="%.6f",ImGuiInputTextFlags extra_flags=0);
-    alias da_ImDrawList_PrimReserve = void function(int idx_count,int vtx_count);
-    alias da_ImDrawList_AddLine = void function(const ImVec2 a,const ImVec2 b,ImU32 col,float thickness=1.0f);
+    alias da_igInputDouble = bool function(const char* label,double* v,double step = 0.0f,double step_fast = 0.0f,const char* format = "%.6f",ImGuiInputTextFlags extra_flags = 0);
+    alias da_ImDrawList_PrimReserve = void function(ImDrawList* self,int idx_count,int vtx_count);
+    alias da_ImDrawList_AddLine = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,ImU32 col,float thickness = 1.0f);
     alias da_igEndPopup = void function();
-    alias da_ImFontAtlas_ClearInputData = void function();
-    alias da_ImDrawList_GetClipRectMin = ImVec2 function();
-    alias da_igInputTextMultiline = bool function(const char* label,char* buf,size_t buf_size,const ImVec2 size=ImVec2(0,0),ImGuiInputTextFlags flags=0,ImGuiInputTextCallback callback=null,void* user_data=null);
-    alias da_igSelectable = bool function(const char* label,bool selected=false,ImGuiSelectableFlags flags=0,const ImVec2 size=ImVec2(0,0));
-    alias da_igListBox = bool function(const char* label,int* current_item,const char** items,int items_count,int height_in_items=-1);
-    alias da_ImDrawList_PopTextureID = void function();
+    alias da_ImFontAtlas_ClearInputData = void function(ImFontAtlas* self);
+    alias da_ImDrawList_GetClipRectMin = ImVec2 function(ImDrawList* self);
+    alias da_igInputTextMultiline = bool function(const char* label,char* buf,size_t buf_size,const ImVec2 size = ImVec2(0,0),ImGuiInputTextFlags flags = 0,ImGuiInputTextCallback callback = null,void* user_data = null);
+    alias da_igSelectable = bool function(const char* label,bool selected = false,ImGuiSelectableFlags flags = 0,const ImVec2 size = ImVec2(0,0));
+    alias da_igSelectableBoolPtr = bool function(const char* label,bool* p_selected,ImGuiSelectableFlags flags = 0,const ImVec2 size = ImVec2(0,0));
+    alias da_igListBoxStr_arr = bool function(const char* label,int* current_item,const char** items,int items_count,int height_in_items = -1);
+    alias da_igListBoxFnPtr = bool function(const char* label,int* current_item,ImGuiItemGetter getter,void* data,int items_count,int height_in_items = -1);
+    alias da_ImDrawList_PopTextureID = void function(ImDrawList* self);
     alias da_igSetWindowFocus = void function();
-    alias da_igInputFloat4 = bool function(const char* label,float[4] v,const char* format="%.3f",ImGuiInputTextFlags extra_flags=0);
-    alias da_igGetVersion = const char* function();
+    alias da_igSetWindowFocusStr = void function(const char* name);
+    alias da_igInputFloat4 = bool function(const char* label,float[4] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
+    alias da_ImDrawList_ImDrawList = ImDrawList* function(const ImDrawListSharedData* shared_data);
+    alias da_igGetVersion = const(char)* function();
     alias da_igEndCombo = void function();
-    alias da_igPushID = void function(const char* str_id);
-    alias da_ImGuiListClipper_End = void function();
-    alias da_ImGuiListClipper_Begin = void function(int items_count,float items_height=-1.0f);
-    alias da_igGetDragDropPayload = const ImGuiPayload* function();
+    alias da_ImDrawCmd_ImDrawCmd = ImDrawCmd* function();
+    alias da_igPushIDStr = void function(const char* str_id);
+    alias da_igPushIDRange = void function(const char* str_id_begin,const char* str_id_end);
+    alias da_igPushIDPtr = void function(const void* ptr_id);
+    alias da_igPushIDInt = void function(int int_id);
+    alias da_ImGuiListClipper_End = void function(ImGuiListClipper* self);
+    alias da_ImGuiListClipper_Begin = void function(ImGuiListClipper* self,int items_count,float items_height = -1.0f);
+    alias da_igGetDragDropPayload = const(ImGuiPayload)* function();
     alias da_igAlignTextToFramePadding = void function();
-    alias da_igPopStyleColor = void function(int count=1);
-    alias da_ImGuiListClipper_Step = bool function();
+    alias da_igPopStyleColor = void function(int count = 1);
+    alias da_ImGuiListClipper_Step = bool function(ImGuiListClipper* self);
     alias da_igText = void function(const char* fmt,...);
-    alias da_igBeginMenu = bool function(const char* label,bool enabled=true);
-    alias da_ImGuiStorage_GetFloatRef = float* function(ImGuiID key,float default_val=0.0f);
+    alias da_igBeginMenu = bool function(const char* label,bool enabled = true);
+    alias da_ImGuiListClipper_ImGuiListClipper = ImGuiListClipper* function(int items_count = -1,float items_height = -1.0f);
+    alias da_ImGuiStorage_GetFloatRef = float* function(ImGuiStorage* self,ImGuiID key,float default_val = 0.0f);
     alias da_igEndTooltip = void function();
     alias da_igTextV = void function(const char* fmt,va_list args);
-    alias da_igDragInt = bool function(const char* label,int* v,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format="%d");
+    alias da_igDragInt = bool function(const char* label,int* v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
     alias da_igColorConvertFloat4ToU32 = ImU32 function(const ImVec4 in_);
-    alias da_ImGuiIO_ClearInputCharacters = void function();
-    alias da_ImGuiPayload_IsDataType = bool function(const char* type);
+    alias da_ImGuiIO_ClearInputCharacters = void function(ImGuiIO* self);
+    alias da_ImGuiPayload_IsDataType = bool function(ImGuiPayload* self,const char* type);
     alias da_igPushClipRect = void function(const ImVec2 clip_rect_min,const ImVec2 clip_rect_max,bool intersect_with_current_clip_rect);
     alias da_igSetColumnWidth = void function(int column_index,float width);
+    alias da_ImGuiPayload_ImGuiPayload = ImGuiPayload* function();
     alias da_igBeginMainMenuBar = bool function();
-    alias da_ImGuiInputTextCallbackData_InsertChars = void function(int pos,const char* text,const char* text_end=null);
-    alias da_ImGuiStorage_GetFloat = float function(ImGuiID key,float default_val=0.0f);
-    alias da_ImFontAtlas_GetMouseCursorTexData = bool function(ImGuiMouseCursor cursor,ImVec2* out_offset,ImVec2* out_size,ImVec2[2] out_uv_border,ImVec2[2] out_uv_fill);
-    alias da_igVSliderScalar = bool function(const char* label,const ImVec2 size,ImGuiDataType data_type,void* v,const void* v_min,const void* v_max,const char* format=null,float power=1.0f);
-    alias da_ImGuiStorage_GetVoidPtrRef = void** function(ImGuiID key,void* default_val=null);
-    alias da_igStyleColorsLight = void function(ImGuiStyle* dst=null);
-    alias da_igSliderFloat3 = bool function(const char* label,float[3] v,float v_min,float v_max,const char* format="%.3f",float power=1.0f);
-    alias da_igSetAllocatorFunctions = void function(ImGuiAllocFunc,ImGuiFreeFunc,void* user_data=null);
-    alias da_igDragFloat = bool function(const char* label,float* v,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format="%.3f",float power=1.0f);
-    alias da_ImGuiStorage_GetIntRef = int* function(ImGuiID key,int default_val=0);
+    alias da_CustomRect_CustomRect = CustomRect* function();
+    alias da_ImGuiInputTextCallbackData_InsertChars = void function(ImGuiInputTextCallbackData* self,int pos,const(char)* text,const char* text_end = null);
+    alias da_ImGuiStorage_GetFloat = float function(ImGuiStorage* self,ImGuiID key,float default_val = 0.0f);
+    alias da_ImFontAtlas_GetMouseCursorTexData = bool function(ImFontAtlas* self,ImGuiMouseCursor cursor,ImVec2* out_offset,ImVec2* out_size,ImVec2[2] out_uv_border,ImVec2[2] out_uv_fill);
+    alias da_igVSliderScalar = bool function(const char* label,const ImVec2 size,ImGuiDataType data_type,void* v,const void* v_min,const void* v_max,const char* format = null,float power = 1.0f);
+    alias da_ImGuiStorage_GetVoidPtrRef = void** function(ImGuiStorage* self,ImGuiID key,void* default_val = null);
+    alias da_ImFontConfig_destroy = void function(ImFontConfig* self);
+    alias da_igStyleColorsLight = void function(ImGuiStyle* dst = null);
+    alias da_igSliderFloat3 = bool function(const char* label,float[3] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
+    alias da_igSetAllocatorFunctions = void function(ImGuiAllocFunc,ImGuiFreeFunc,void* user_data = null);
+    alias da_igDragFloat = bool function(const char* label,float* v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
+    alias da_ImGuiStorage_GetIntRef = int* function(ImGuiStorage* self,ImGuiID key,int default_val = 0);
     alias da_igGetWindowHeight = float function();
     alias da_igGetMousePosOnOpeningCurrentPopup = ImVec2 function();
-    alias da_ImGuiStorage_SetVoidPtr = void function(ImGuiID key,void* val);
+    alias da_ImGuiStorage_SetVoidPtr = void function(ImGuiStorage* self,ImGuiID key,void* val);
     alias da_igCalcListClipping = void function(int items_count,float items_height,int* out_items_display_start,int* out_items_display_end);
-    alias da_ImGuiStorage_SetFloat = void function(ImGuiID key,float val);
+    alias da_ImGuiStorage_SetFloat = void function(ImGuiStorage* self,ImGuiID key,float val);
     alias da_igEndDragDropSource = void function();
-    alias da_ImGuiStorage_BuildSortByKey = void function();
-    alias da_ImGuiStorage_SetBool = void function(ImGuiID key,bool val);
-    alias da_ImGuiStorage_GetBool = bool function(ImGuiID key,bool default_val=false);
-    alias da_ImGuiStorage_SetInt = void function(ImGuiID key,int val);
+    alias da_ImGuiStorage_BuildSortByKey = void function(ImGuiStorage* self);
+    alias da_ImGuiStorage_SetBool = void function(ImGuiStorage* self,ImGuiID key,bool val);
+    alias da_ImGuiStorage_GetBool = bool function(ImGuiStorage* self,ImGuiID key,bool default_val = false);
+    alias da_ImGuiStorage_SetInt = void function(ImGuiStorage* self,ImGuiID key,int val);
     alias da_igLabelTextV = void function(const char* label,const char* fmt,va_list args);
     alias da_igGetFrameHeightWithSpacing = float function();
-    alias da_igTreeNodeEx = bool function(const char* label,ImGuiTreeNodeFlags flags=0);
+    alias da_igTreeNodeExStr = bool function(const char* label,ImGuiTreeNodeFlags flags = 0);
+    alias da_igTreeNodeExStrStr = bool function(const char* str_id,ImGuiTreeNodeFlags flags,const char* fmt,...);
+    alias da_igTreeNodeExPtr = bool function(const void* ptr_id,ImGuiTreeNodeFlags flags,const char* fmt,...);
     alias da_igCloseCurrentPopup = void function();
-    alias da_ImGuiTextBuffer_clear = void function();
-    alias da_ImGuiStorage_Clear = void function();
-    alias da_ImGuiTextBuffer_appendf = void function(const char* fmt,...);
-    alias da_ImGuiTextBuffer_c_str = const char* function();
-    alias da_ImGuiTextBuffer_reserve = void function(int capacity);
-    alias da_ImGuiTextBuffer_empty = bool function();
-    alias da_igSliderScalar = bool function(const char* label,ImGuiDataType data_type,void* v,const void* v_min,const void* v_max,const char* format=null,float power=1.0f);
-    alias da_igTreePush = void function(const char* str_id);
+    alias da_ImGuiTextBuffer_clear = void function(ImGuiTextBuffer* self);
+    alias da_ImGuiStorage_Clear = void function(ImGuiStorage* self);
+    alias da_Pair_PairInt = Pair* function(ImGuiID _key,int _val_i);
+    alias da_Pair_PairFloat = Pair* function(ImGuiID _key,float _val_f);
+    alias da_Pair_PairPtr = Pair* function(ImGuiID _key,void* _val_p);
+    alias da_ImGuiTextBuffer_appendf = void function(ImGuiTextBuffer* self,const char* fmt,...);
+    alias da_ImGuiTextBuffer_c_str = const(char)* function(ImGuiTextBuffer* self);
+    alias da_ImGuiTextBuffer_reserve = void function(ImGuiTextBuffer* self,int capacity);
+    alias da_ImGuiTextBuffer_empty = bool function(ImGuiTextBuffer* self);
+    alias da_ImVec4_destroy = void function(ImVec4* self);
+    alias da_igSliderScalar = bool function(const char* label,ImGuiDataType data_type,void* v,const void* v_min,const void* v_max,const char* format = null,float power = 1.0f);
+    alias da_igTreePushStr = void function(const char* str_id);
+    alias da_igTreePushPtr = void function(const void* ptr_id = null);
     alias da_igListBoxFooter = void function();
     alias da_igTextDisabled = void function(const char* fmt,...);
-    alias da_igIsItemHovered = bool function(ImGuiHoveredFlags flags=0);
-    alias da_ImDrawList_PrimWriteVtx = void function(const ImVec2 pos,const ImVec2 uv,ImU32 col);
+    alias da_igIsItemHovered = bool function(ImGuiHoveredFlags flags = 0);
+    alias da_ImDrawList_PrimWriteVtx = void function(ImDrawList* self,const ImVec2 pos,const ImVec2 uv,ImU32 col);
     alias da_igBullet = void function();
-    alias da_igInputInt3 = bool function(const char* label,int[3] v,ImGuiInputTextFlags extra_flags=0);
-    alias da_TextRange_end = const char* function();
-    alias da_igStyleColorsDark = void function(ImGuiStyle* dst=null);
-    alias da_igInputInt = bool function(const char* label,int* v,int step=1,int step_fast=100,ImGuiInputTextFlags extra_flags=0);
+    alias da_ImGuiIO_ImGuiIO = ImGuiIO* function();
+    alias da_igInputInt3 = bool function(const char* label,int[3] v,ImGuiInputTextFlags extra_flags = 0);
+    alias da_TextRange_end = const(char)* function(TextRange* self);
+    alias da_igStyleColorsDark = void function(ImGuiStyle* dst = null);
+    alias da_igInputInt = bool function(const char* label,int* v,int step = 1,int step_fast = 100,ImGuiInputTextFlags extra_flags = 0);
     alias da_igSetWindowFontScale = void function(float scale);
-    alias da_igSliderInt = bool function(const char* label,int* v,int v_min,int v_max,const char* format="%d");
-    alias da_TextRange_begin = const char* function();
-    alias da_igSetNextWindowPos = void function(const ImVec2 pos,ImGuiCond cond=0,const ImVec2 pivot=ImVec2(0,0));
-    alias da_igDragInt3 = bool function(const char* label,int[3] v,float v_speed=1.0f,int v_min=0,int v_max=0,const char* format="%d");
+    alias da_igSliderInt = bool function(const char* label,int* v,int v_min,int v_max,const char* format = "%d");
+    alias da_TextRange_begin = const(char)* function(TextRange* self);
+    alias da_TextRange_TextRange = TextRange* function();
+    alias da_TextRange_TextRangeStr = TextRange* function(const char* _b,const char* _e);
+    alias da_igSetNextWindowPos = void function(const ImVec2 pos,ImGuiCond cond = 0,const ImVec2 pivot = ImVec2(0,0));
+    alias da_igDragInt3 = bool function(const char* label,int[3] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
     alias da_igOpenPopup = void function(const char* str_id);
     alias da_igSetColumnOffset = void function(int column_index,float offset_x);
-    alias da_ImDrawList_GetClipRectMax = ImVec2 function();
-    alias da_igBeginCombo = bool function(const char* label,const char* preview_value,ImGuiComboFlags flags=0);
+    alias da_ImDrawList_GetClipRectMax = ImVec2 function(ImDrawList* self);
+    alias da_igBeginCombo = bool function(const char* label,const char* preview_value,ImGuiComboFlags flags = 0);
     alias da_igGetDrawListSharedData = ImDrawListSharedData* function();
-    alias da_ImGuiTextFilter_Draw = bool function(const char* label="Filter(inc,-exc)",float width=0.0f);
+    alias da_ImGuiTextFilter_Draw = bool function(ImGuiTextFilter* self,const char* label = "Filter(inc,-exc)",float width = 0.0f);
     alias da_igIsItemActive = bool function();
+    alias da_ImGuiTextFilter_ImGuiTextFilter = ImGuiTextFilter* function(const char* default_filter = "");
+    alias da_ImGuiOnceUponAFrame_ImGuiOnceUponAFrame = ImGuiOnceUponAFrame* function();
     alias da_igBeginDragDropTarget = bool function();
-    alias da_TextRange_empty = bool function();
-    alias da_ImGuiPayload_IsDelivery = bool function();
-    alias da_ImGuiIO_AddInputCharacter = void function(ImWchar c);
-    alias da_ImDrawList_AddImageRounded = void function(ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 uv_a,const ImVec2 uv_b,ImU32 col,float rounding,int rounding_corners=ImDrawCornerFlags_All);
-    alias da_igPushStyleColor = void function(ImGuiCol idx,ImU32 col);
+    alias da_TextRange_empty = bool function(TextRange* self);
+    alias da_ImGuiPayload_IsDelivery = bool function(ImGuiPayload* self);
+    alias da_ImGuiIO_AddInputCharacter = void function(ImGuiIO* self,ImWchar c);
+    alias da_ImDrawList_AddImageRounded = void function(ImDrawList* self,ImTextureID user_texture_id,const ImVec2 a,const ImVec2 b,const ImVec2 uv_a,const ImVec2 uv_b,ImU32 col,float rounding,int rounding_corners = ImDrawCornerFlags_All);
+    alias da_ImGuiStyle_ImGuiStyle = ImGuiStyle* function();
+    alias da_igPushStyleColorU32 = void function(ImGuiCol idx,ImU32 col);
+    alias da_igPushStyleColor = void function(ImGuiCol idx,const ImVec4 col);
     alias da_igGetContentRegionMax = ImVec2 function();
-    alias da_igBeginChildFrame = bool function(ImGuiID id,const ImVec2 size,ImGuiWindowFlags flags=0);
+    alias da_igBeginChildFrame = bool function(ImGuiID id,const ImVec2 size,ImGuiWindowFlags flags = 0);
     alias da_igSaveIniSettingsToDisk = void function(const char* ini_filename);
-    alias da_ImFont_ClearOutputData = void function();
-    alias da_ImDrawList_PrimQuadUV = void function(const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,const ImVec2 uv_a,const ImVec2 uv_b,const ImVec2 uv_c,const ImVec2 uv_d,ImU32 col);
+    alias da_ImFont_ClearOutputData = void function(ImFont* self);
+    alias da_ImColor_destroy = void function(ImColor* self);
+    alias da_ImDrawList_PrimQuadUV = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 c,const ImVec2 d,const ImVec2 uv_a,const ImVec2 uv_b,const ImVec2 uv_c,const ImVec2 uv_d,ImU32 col);
     alias da_igEndDragDropTarget = void function();
-    alias da_ImFontAtlas_GetGlyphRangesKorean = const ImWchar* function();
+    alias da_ImFontAtlas_GetGlyphRangesKorean = const(ImWchar)* function(ImFontAtlas* self);
     alias da_igGetKeyPressedAmount = int function(int key_index,float repeat_delay,float rate);
-    alias da_ImFontAtlas_GetTexDataAsRGBA32 = void function(char** out_pixels,int* out_width,int* out_height,int* out_bytes_per_pixel=null);
+    alias da_ImFontAtlas_GetTexDataAsRGBA32 = void function(ImFontAtlas* self,char** out_pixels,int* out_width,int* out_height,int* out_bytes_per_pixel = null);
     alias da_igNewFrame = void function();
-    alias da_igResetMouseDragDelta = void function(int button=0);
+    alias da_igResetMouseDragDelta = void function(int button = 0);
     alias da_igGetTreeNodeToLabelSpacing = float function();
     alias da_igGetMousePos = ImVec2 function();
-    alias da_GlyphRangesBuilder_AddChar = void function(ImWchar c);
+    alias da_GlyphRangesBuilder_AddChar = void function(GlyphRangesBuilder* self,ImWchar c);
     alias da_igPopID = void function();
     alias da_igIsMouseDoubleClicked = bool function(int button);
-    alias da_igSetNextWindowSize = void function(const ImVec2 size,ImGuiCond cond=0);
-    alias da_ImGuiTextFilter_IsActive = bool function();
-    alias da_ImDrawList_PathClear = void function();
+    alias da_igSetNextWindowSize = void function(const ImVec2 size,ImGuiCond cond = 0);
+    alias da_ImGuiTextFilter_IsActive = bool function(ImGuiTextFilter* self);
+    alias da_ImDrawList_PathClear = void function(ImDrawList* self);
     alias da_igBeginGroup = void function();
-    alias da_igColorConvertHSVtoRGB = void function(float h,float s,float v,float out_r,float out_g,float out_b);
-    alias da_igVSliderFloat = bool function(const char* label,const ImVec2 size,float* v,float v_min,float v_max,const char* format="%.3f",float power=1.0f);
+    alias da_igColorConvertHSVtoRGB = void function(float h,float s,float v,float* out_r,float* out_g,float* out_b);
+    alias da_ImColor_ImColor = ImColor* function();
+    alias da_ImColor_ImColorInt = ImColor* function(int r,int g,int b,int a = 255);
+    alias da_ImColor_ImColorU32 = ImColor* function(ImU32 rgba);
+    alias da_ImColor_ImColorFloat = ImColor* function(float r,float g,float b,float a = 1.0f);
+    alias da_ImColor_ImColorVec4 = ImColor* function(const ImVec4 col);
+    alias da_igVSliderFloat = bool function(const char* label,const ImVec2 size,float* v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
     alias da_igColorConvertU32ToFloat4 = ImVec4 function(ImU32 in_);
     alias da_igPopTextWrapPos = void function();
-    alias da_ImGuiTextFilter_Clear = void function();
-    alias da_igGetColumnWidth = float function(int column_index=-1);
+    alias da_ImGuiTextFilter_Clear = void function(ImGuiTextFilter* self);
+    alias da_GlyphRangesBuilder_destroy = void function(GlyphRangesBuilder* self);
+    alias da_igGetColumnWidth = float function(int column_index = -1);
     alias da_igEndMenuBar = void function();
-    alias da_igGetStyleColorName = const char* function(ImGuiCol idx);
-    alias da_igIsMouseDragging = bool function(int button=0,float lock_threshold=-1.0f);
-    alias da_ImDrawList_PrimWriteIdx = void function(ImDrawIdx idx);
-    alias da_ImGuiStyle_ScaleAllSizes = void function(float scale_factor);
+    alias da_ImGuiTextFilter_destroy = void function(ImGuiTextFilter* self);
+    alias da_igGetStyleColorName = const(char)* function(ImGuiCol idx);
+    alias da_igIsMouseDragging = bool function(int button = 0,float lock_threshold = -1.0f);
+    alias da_ImDrawList_PrimWriteIdx = void function(ImDrawList* self,ImDrawIdx idx);
+    alias da_ImGuiStyle_ScaleAllSizes = void function(ImGuiStyle* self,float scale_factor);
     alias da_igGetItemRectSize = ImVec2 function();
     alias da_igMemAlloc = void* function(size_t size);
-    alias da_igColorPicker3 = bool function(const char* label,float[3] col,ImGuiColorEditFlags flags=0);
+    alias da_igColorPicker3 = bool function(const char* label,float[3] col,ImGuiColorEditFlags flags = 0);
     alias da_igSetCurrentContext = void function(ImGuiContext* ctx);
     alias da_igPushItemWidth = void function(float item_width);
     alias da_igGetStyle = ImGuiStyle* function();
     alias da_igSetItemAllowOverlap = void function();
     alias da_igEndChild = void function();
-    alias da_igCollapsingHeader = bool function(const char* label,ImGuiTreeNodeFlags flags=0);
+    alias da_igCollapsingHeader = bool function(const char* label,ImGuiTreeNodeFlags flags = 0);
+    alias da_igCollapsingHeaderBoolPtr = bool function(const char* label,bool* p_open,ImGuiTreeNodeFlags flags = 0);
     alias da_igTextDisabledV = void function(const char* fmt,va_list args);
-    alias da_igDragFloatRange2 = bool function(const char* label,float* v_current_min,float* v_current_max,float v_speed=1.0f,float v_min=0.0f,float v_max=0.0f,const char* format="%.3f",const char* format_max=null,float power=1.0f);
+    alias da_igDragFloatRange2 = bool function(const char* label,float* v_current_min,float* v_current_max,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",const char* format_max = null,float power = 1.0f);
     alias da_igSetMouseCursor = void function(ImGuiMouseCursor type);
     alias da_igShowFontSelector = void function(const char* label);
-    alias da_igInputScalar = bool function(const char* label,ImGuiDataType data_type,void* v,const void* step=null,const void* step_fast=null,const char* format=null,ImGuiInputTextFlags extra_flags=0);
-    alias da_ImDrawList_PushClipRectFullScreen = void function();
+    alias da_igInputScalar = bool function(const char* label,ImGuiDataType data_type,void* v,const void* step = null,const void* step_fast = null,const char* format = null,ImGuiInputTextFlags extra_flags = 0);
+    alias da_ImDrawList_PushClipRectFullScreen = void function(ImDrawList* self);
     alias da_igShowStyleSelector = bool function(const char* label);
     alias da_igGetTime = double function();
-    alias da_ImDrawList_ChannelsMerge = void function();
+    alias da_ImDrawList_ChannelsMerge = void function(ImDrawList* self);
     alias da_igGetColumnIndex = int function();
-    alias da_igBeginPopupContextItem = bool function(const char* str_id=null,int mouse_button=1);
+    alias da_igBeginPopupContextItem = bool function(const char* str_id = null,int mouse_button = 1);
     alias da_igGetCursorPosX = float function();
     alias da_igEndMainMenuBar = void function();
     alias da_igSetCursorPosX = void function(float x);
     alias da_igGetMouseCursor = ImGuiMouseCursor function();
-    alias da_igMenuItem = bool function(const char* label,const char* shortcut=null,bool selected=false,bool enabled=true);
+    alias da_igMenuItemBool = bool function(const char* label,const char* shortcut = null,bool selected = false,bool enabled = true);
+    alias da_igMenuItemBoolPtr = bool function(const char* label,const char* shortcut,bool* p_selected,bool enabled = true);
     alias da_igGetScrollY = float function();
     alias da_igPushAllowKeyboardFocus = void function(bool allow_keyboard_focus);
-    alias da_ImGuiTextBuffer_begin = const char* function();
+    alias da_ImGuiTextBuffer_begin = const(char)* function(ImGuiTextBuffer* self);
     alias da_igSetCursorPosY = void function(float y);
-    alias da_igSetWindowPos = void function(const ImVec2 pos,ImGuiCond cond=0);
+    alias da_igSetWindowPosVec2 = void function(const ImVec2 pos,ImGuiCond cond = 0);
+    alias da_igSetWindowPosStr = void function(const char* name,const ImVec2 pos,ImGuiCond cond = 0);
     alias da_igGetCursorPosY = float function();
-    alias da_ImFontAtlas_AddCustomRectFontGlyph = int function(ImFont* font,ImWchar id,int width,int height,float advance_x,const ImVec2 offset=ImVec2(0,0));
+    alias da_ImFontAtlas_AddCustomRectFontGlyph = int function(ImFontAtlas* self,ImFont* font,ImWchar id,int width,int height,float advance_x,const ImVec2 offset = ImVec2(0,0));
+    alias da_ImVec2_ImVec2 = ImVec2* function();
+    alias da_ImVec2_ImVec2Float = ImVec2* function(float _x,float _y);
     alias da_igBulletTextV = void function(const char* fmt,va_list args);
     alias da_igGetContentRegionAvailWidth = float function();
     alias da_igEnd = void function();
@@ -1261,46 +2247,55 @@ extern(C) @nogc nothrow
     alias da_igIsMouseDown = bool function(int button);
     alias da_igGetCursorPos = ImVec2 function();
     alias da_igLogButtons = void function();
-    alias da_igDestroyContext = void function(ImGuiContext* ctx=null);
-    alias da_igSliderAngle = bool function(const char* label,float* v_rad,float v_degrees_min=-360.0f,float v_degrees_max=+360.0f,const char* format="%.0f deg");
+    alias da_igDestroyContext = void function(ImGuiContext* ctx = null);
+    alias da_igSliderAngle = bool function(const char* label,float* v_rad,float v_degrees_min = -360.0f,float v_degrees_max = +360.0f,const char* format = "%.0f deg");
     alias da_igSetNextWindowContentSize = void function(const ImVec2 size);
     alias da_igGetWindowWidth = float function();
     alias da_igGetWindowContentRegionMin = ImVec2 function();
-    alias da_ImGuiStorage_GetInt = int function(ImGuiID key,int default_val=0);
-    alias da_igSliderInt3 = bool function(const char* label,int[3] v,int v_min,int v_max,const char* format="%d");
-    alias da_igPushTextWrapPos = void function(float wrap_pos_x=0.0f);
-    alias da_igSliderScalarN = bool function(const char* label,ImGuiDataType data_type,void* v,int components,const void* v_min,const void* v_max,const char* format=null,float power=1.0f);
-    alias da_ImColor_HSV = ImColor function(float h,float s,float v,float a=1.0f);
-    alias da_ImDrawList_PathLineTo = void function(const ImVec2 pos);
-    alias da_igStyleColorsClassic = void function(ImGuiStyle* dst=null);
-    alias da_igSliderFloat = bool function(const char* label,float* v,float v_min,float v_max,const char* format="%.3f",float power=1.0f);
-    alias da_igImage = void function(ImTextureID user_texture_id,const ImVec2 size,const ImVec2 uv0=ImVec2(0,0),const ImVec2 uv1=ImVec2(1,1),const ImVec4 tint_col=ImVec4(1,1,1,1),const ImVec4 border_col=ImVec4(0,0,0,0));
+    alias da_ImGuiStorage_GetInt = int function(ImGuiStorage* self,ImGuiID key,int default_val = 0);
+    alias da_igSliderInt3 = bool function(const char* label,int[3] v,int v_min,int v_max,const char* format = "%d");
+    alias da_igPushTextWrapPos = void function(float wrap_pos_x = 0.0f);
+    alias da_igSliderScalarN = bool function(const char* label,ImGuiDataType data_type,void* v,int components,const void* v_min,const void* v_max,const char* format = null,float power = 1.0f);
+    alias da_ImColor_HSV = ImColor function(ImColor* self,float h,float s,float v,float a = 1.0f);
+    alias da_ImDrawList_PathLineTo = void function(ImDrawList* self,const ImVec2 pos);
+    alias da_igStyleColorsClassic = void function(ImGuiStyle* dst = null);
+    alias da_igSliderFloat = bool function(const char* label,float* v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
+    alias da_ImFont_destroy = void function(ImFont* self);
+    alias da_igImage = void function(ImTextureID user_texture_id,const ImVec2 size,const ImVec2 uv0 = ImVec2(0,0),const ImVec2 uv1 = ImVec2(1,1),const ImVec4 tint_col = ImVec4(1,1,1,1),const ImVec4 border_col = ImVec4(0,0,0,0));
+    alias da_ImGuiTextBuffer_ImGuiTextBuffer = ImGuiTextBuffer* function();
     alias da_igBulletText = void function(const char* fmt,...);
-    alias da_igInputFloat2 = bool function(const char* label,float[2] v,const char* format="%.3f",ImGuiInputTextFlags extra_flags=0);
+    alias da_igInputFloat2 = bool function(const char* label,float[2] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
     alias da_igGetTextLineHeightWithSpacing = float function();
-    alias da_ImDrawList_PrimRectUV = void function(const ImVec2 a,const ImVec2 b,const ImVec2 uv_a,const ImVec2 uv_b,ImU32 col);
-    alias da_igColorEdit4 = bool function(const char* label,float[4] col,ImGuiColorEditFlags flags=0);
-    alias da_igLogToClipboard = void function(int max_depth=-1);
-    alias da_igBeginPopupContextWindow = bool function(const char* str_id=null,int mouse_button=1,bool also_over_items=true);
-    alias da_igDragScalar = bool function(const char* label,ImGuiDataType data_type,void* v,float v_speed,const void* v_min=null,const void* v_max=null,const char* format=null,float power=1.0f);
+    alias da_ImDrawList_PrimRectUV = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 uv_a,const ImVec2 uv_b,ImU32 col);
+    alias da_igColorEdit4 = bool function(const char* label,float[4] col,ImGuiColorEditFlags flags = 0);
+    alias da_igLogToClipboard = void function(int max_depth = -1);
+    alias da_igBeginPopupContextWindow = bool function(const char* str_id = null,int mouse_button = 1,bool also_over_items = true);
+    alias da_ImFontAtlas_ImFontAtlas = ImFontAtlas* function();
+    alias da_igDragScalar = bool function(const char* label,ImGuiDataType data_type,void* v,float v_speed,const void* v_min = null,const void* v_max = null,const char* format = null,float power = 1.0f);
     alias da_igSetItemDefaultFocus = void function();
-    alias da_igCaptureMouseFromApp = void function(bool capture=true);
+    alias da_igCaptureMouseFromApp = void function(bool capture = true);
     alias da_igIsAnyItemHovered = bool function();
     alias da_igPushFont = void function(ImFont* font);
+    alias da_ImDrawData_destroy = void function(ImDrawData* self);
     alias da_igTreePop = void function();
     alias da_igGetWindowContentRegionWidth = float function();
-    alias da_igInputText = bool function(const char* label,char* buf,size_t buf_size,ImGuiInputTextFlags flags=0,ImGuiInputTextCallback callback=null,void* user_data=null);
-    alias da_ImGuiTextBuffer_end = const char* function();
-    alias da_igPopStyleVar = void function(int count=1);
-    alias da_ImGuiTextFilter_PassFilter = bool function(const char* text,const char* text_end=null);
+    alias da_ImDrawData_ImDrawData = ImDrawData* function();
+    alias da_igInputText = bool function(const char* label,char* buf,size_t buf_size,ImGuiInputTextFlags flags = 0,ImGuiInputTextCallback callback = null,void* user_data = null);
+    alias da_ImGuiTextBuffer_end = const(char)* function(ImGuiTextBuffer* self);
+    alias da_igPopStyleVar = void function(int count = 1);
+    alias da_ImGuiTextFilter_PassFilter = bool function(ImGuiTextFilter* self,const char* text,const char* text_end = null);
+    alias da_ImGuiOnceUponAFrame_destroy = void function(ImGuiOnceUponAFrame* self);
     alias da_igGetFont = ImFont* function();
-    alias da_igTreeNode = bool function(const char* label);
-    alias da_igTreeNodeV = bool function(const char* str_id,const char* fmt,va_list args);
+    alias da_igTreeNodeStr = bool function(const char* label);
+    alias da_igTreeNodeStrStr = bool function(const char* str_id,const char* fmt,...);
+    alias da_igTreeNodePtr = bool function(const void* ptr_id,const char* fmt,...);
+    alias da_igTreeNodeVStr = bool function(const char* str_id,const char* fmt,va_list args);
+    alias da_igTreeNodeVPtr = bool function(const void* ptr_id,const char* fmt,va_list args);
     alias da_igGetScrollMaxX = float function();
     alias da_igSetTooltip = void function(const char* fmt,...);
     alias da_igGetContentRegionAvail = ImVec2 function();
-    alias da_igInputFloat3 = bool function(const char* label,float[3] v,const char* format="%.3f",ImGuiInputTextFlags extra_flags=0);
-    alias da_igSetKeyboardFocusHere = void function(int offset=0);
+    alias da_igInputFloat3 = bool function(const char* label,float[3] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
+    alias da_igSetKeyboardFocusHere = void function(int offset = 0);
 }
 
 __gshared
@@ -1310,6 +2305,8 @@ __gshared
 	da_igTextUnformatted igTextUnformatted;
 	da_igPopFont igPopFont;
 	da_igCombo igCombo;
+	da_igComboStr igComboStr;
+	da_igComboFnPtr igComboFnPtr;
 	da_igCaptureKeyboardFromApp igCaptureKeyboardFromApp;
 	da_igIsWindowFocused igIsWindowFocused;
 	da_igRender igRender;
@@ -1321,27 +2318,42 @@ __gshared
 	da_igDebugCheckVersionAndDataLayout igDebugCheckVersionAndDataLayout;
 	da_igSliderFloat4 igSliderFloat4;
 	da_igSetScrollY igSetScrollY;
+	da_CustomRect_destroy CustomRect_destroy;
 	da_igGetStateStorage igGetStateStorage;
 	da_igSetColorEditOptions igSetColorEditOptions;
+	da_ImFontAtlas_destroy ImFontAtlas_destroy;
 	da_ImGuiStorage_GetBoolRef ImGuiStorage_GetBoolRef;
 	da_igInputScalarN igInputScalarN;
 	da_igColorPicker4 igColorPicker4;
+	da_ImGuiInputTextCallbackData_destroy ImGuiInputTextCallbackData_destroy;
 	da_igSetScrollFromPosY igSetScrollFromPosY;
+	da_ImDrawCmd_destroy ImDrawCmd_destroy;
 	da_ImDrawList_Clear ImDrawList_Clear;
 	da_igGetStyleColorVec4 igGetStyleColorVec4;
 	da_igGetClipboardText igGetClipboardText;
 	da_igIsMouseHoveringRect igIsMouseHoveringRect;
+	da_ImVec4_ImVec4 ImVec4_ImVec4;
+	da_ImVec4_ImVec4Float ImVec4_ImVec4Float;
+	da_ImGuiPayload_destroy ImGuiPayload_destroy;
 	da_ImColor_SetHSV ImColor_SetHSV;
+	da_Pair_destroy Pair_destroy;
 	da_igDragFloat3 igDragFloat3;
 	da_ImDrawList_AddPolyline ImDrawList_AddPolyline;
+	da_ImGuiTextBuffer_destroy ImGuiTextBuffer_destroy;
 	da_igCalcTextSize igCalcTextSize;
 	da_igSetStateStorage igSetStateStorage;
-	da_igValue igValue;
+	da_igValueBool igValueBool;
+	da_igValueInt igValueInt;
+	da_igValueUint igValueUint;
+	da_igValueFloat igValueFloat;
 	da_igColumns igColumns;
 	da_ImGuiTextFilter_Build ImGuiTextFilter_Build;
+	da_ImGuiIO_destroy ImGuiIO_destroy;
 	da_igGetItemRectMax igGetItemRectMax;
+	da_ImGuiStyle_destroy ImGuiStyle_destroy;
 	da_igIsItemDeactivated igIsItemDeactivated;
-	da_igPushStyleVar igPushStyleVar;
+	da_igPushStyleVarFloat igPushStyleVarFloat;
+	da_igPushStyleVarVec2 igPushStyleVarVec2;
 	da_igSaveIniSettingsToMemory igSaveIniSettingsToMemory;
 	da_ImGuiTextBuffer_size ImGuiTextBuffer_size;
 	da_igDragIntRange2 igDragIntRange2;
@@ -1349,6 +2361,7 @@ __gshared
 	da_ImFontAtlas_AddFontFromMemoryCompressedBase85TTF ImFontAtlas_AddFontFromMemoryCompressedBase85TTF;
 	da_igPopAllowKeyboardFocus igPopAllowKeyboardFocus;
 	da_igLoadIniSettingsFromDisk igLoadIniSettingsFromDisk;
+	da_ImVec2_destroy ImVec2_destroy;
 	da_igGetCursorStartPos igGetCursorStartPos;
 	da_igSetCursorScreenPos igSetCursorScreenPos;
 	da_ImFont_AddRemapChar ImFont_AddRemapChar;
@@ -1357,6 +2370,8 @@ __gshared
 	da_ImFont_GrowIndex ImFont_GrowIndex;
 	da_ImFont_RenderText ImFont_RenderText;
 	da_igIsRectVisible igIsRectVisible;
+	da_igIsRectVisibleVec2 igIsRectVisibleVec2;
+	da_ImDrawList_destroy ImDrawList_destroy;
 	da_ImFontAtlas_Build ImFontAtlas_Build;
 	da_igLabelText igLabelText;
 	da_ImFont_CalcWordWrapPositionA ImFont_CalcWordWrapPositionA;
@@ -1370,6 +2385,7 @@ __gshared
 	da_igSmallButton igSmallButton;
 	da_igOpenPopupOnItemClick igOpenPopupOnItemClick;
 	da_igIsAnyMouseDown igIsAnyMouseDown;
+	da_GlyphRangesBuilder_GlyphRangesBuilder GlyphRangesBuilder_GlyphRangesBuilder;
 	da_ImFont_IsLoaded ImFont_IsLoaded;
 	da_ImFont_GetCharAdvance ImFont_GetCharAdvance;
 	da_ImFont_SetFallbackChar ImFont_SetFallbackChar;
@@ -1379,7 +2395,8 @@ __gshared
 	da_igEndFrame igEndFrame;
 	da_igSliderFloat2 igSliderFloat2;
 	da_ImFont_RenderChar ImFont_RenderChar;
-	da_igRadioButton igRadioButton;
+	da_igRadioButtonBool igRadioButtonBool;
+	da_igRadioButtonIntPtr igRadioButtonIntPtr;
 	da_ImDrawList_PushClipRect ImDrawList_PushClipRect;
 	da_igLoadIniSettingsFromMemory igLoadIniSettingsFromMemory;
 	da_igIsItemDeactivatedAfterEdit igIsItemDeactivatedAfterEdit;
@@ -1388,9 +2405,11 @@ __gshared
 	da_ImGuiPayload_Clear ImGuiPayload_Clear;
 	da_igNewLine igNewLine;
 	da_igIsItemFocused igIsItemFocused;
+	da_ImFont_ImFont ImFont_ImFont;
 	da_igSliderInt2 igSliderInt2;
 	da_ImGuiStorage_SetAllInt ImGuiStorage_SetAllInt;
-	da_igSetWindowSize igSetWindowSize;
+	da_igSetWindowSizeVec2 igSetWindowSizeVec2;
+	da_igSetWindowSizeStr igSetWindowSizeStr;
 	da_igInputFloat igInputFloat;
 	da_ImFontAtlas_CalcCustomRectUV ImFontAtlas_CalcCustomRectUV;
 	da_ImFontAtlas_GetCustomRectByIndex ImFontAtlas_GetCustomRectByIndex;
@@ -1406,12 +2425,14 @@ __gshared
 	da_ImDrawList_UpdateTextureID ImDrawList_UpdateTextureID;
 	da_CustomRect_IsPacked CustomRect_IsPacked;
 	da_ImGuiInputTextCallbackData_HasSelection ImGuiInputTextCallbackData_HasSelection;
-	da_igSetWindowCollapsed igSetWindowCollapsed;
+	da_igSetWindowCollapsedBool igSetWindowCollapsedBool;
+	da_igSetWindowCollapsedStr igSetWindowCollapsedStr;
 	da_igGetMouseDragDelta igGetMouseDragDelta;
 	da_igAcceptDragDropPayload igAcceptDragDropPayload;
 	da_igBeginDragDropSource igBeginDragDropSource;
 	da_ImDrawList_AddCallback ImDrawList_AddCallback;
 	da_igPlotLines igPlotLines;
+	da_igPlotLinesFnPtr igPlotLinesFnPtr;
 	da_ImFontAtlas_IsBuilt ImFontAtlas_IsBuilt;
 	da_igTextWrapped igTextWrapped;
 	da_GlyphRangesBuilder_AddRanges GlyphRangesBuilder_AddRanges;
@@ -1419,7 +2440,8 @@ __gshared
 	da_GlyphRangesBuilder_SetBit GlyphRangesBuilder_SetBit;
 	da_ImDrawList_PathFillConvex ImDrawList_PathFillConvex;
 	da_ImFont_GetDebugName ImFont_GetDebugName;
-	da_igListBoxHeader igListBoxHeader;
+	da_igListBoxHeaderVec2 igListBoxHeaderVec2;
+	da_igListBoxHeaderInt igListBoxHeaderInt;
 	da_igPopClipRect igPopClipRect;
 	da_ImFontAtlas_GetGlyphRangesThai ImFontAtlas_GetGlyphRangesThai;
 	da_ImFontAtlas_GetGlyphRangesCyrillic ImFontAtlas_GetGlyphRangesCyrillic;
@@ -1428,19 +2450,23 @@ __gshared
 	da_igCheckboxFlags igCheckboxFlags;
 	da_ImFontAtlas_GetGlyphRangesChineseFull ImFontAtlas_GetGlyphRangesChineseFull;
 	da_igIsWindowHovered igIsWindowHovered;
-	da_igPlotHistogram igPlotHistogram;
+	da_ImFontConfig_ImFontConfig ImFontConfig_ImFontConfig;
+	da_igPlotHistogramFloatPtr igPlotHistogramFloatPtr;
+	da_igPlotHistogramFnPtr igPlotHistogramFnPtr;
 	da_igBeginPopupContextVoid igBeginPopupContextVoid;
 	da_igShowStyleEditor igShowStyleEditor;
 	da_igShowUserGuide igShowUserGuide;
 	da_igCheckbox igCheckbox;
 	da_igGetWindowPos igGetWindowPos;
 	da_ImFontAtlas_GetGlyphRangesDefault ImFontAtlas_GetGlyphRangesDefault;
+	da_ImGuiInputTextCallbackData_ImGuiInputTextCallbackData ImGuiInputTextCallbackData_ImGuiInputTextCallbackData;
 	da_ImFontAtlas_SetTexID ImFontAtlas_SetTexID;
 	da_igTextColored igTextColored;
 	da_igLogToFile igLogToFile;
 	da_igButton igButton;
 	da_igIsItemEdited igIsItemEdited;
-	da_igTreeNodeExV igTreeNodeExV;
+	da_igTreeNodeExVStr igTreeNodeExVStr;
+	da_igTreeNodeExVPtr igTreeNodeExVPtr;
 	da_ImDrawList_PushTextureID ImDrawList_PushTextureID;
 	da_igTreeAdvanceToLabelPos igTreeAdvanceToLabelPos;
 	da_ImGuiInputTextCallbackData_DeleteChars ImGuiInputTextCallbackData_DeleteChars;
@@ -1452,6 +2478,7 @@ __gshared
 	da_ImFontAtlas_ClearFonts ImFontAtlas_ClearFonts;
 	da_igDummy igDummy;
 	da_ImFontAtlas_ClearTexData ImFontAtlas_ClearTexData;
+	da_TextRange_destroy TextRange_destroy;
 	da_igGetColumnsCount igGetColumnsCount;
 	da_igPopButtonRepeat igPopButtonRepeat;
 	da_igDragScalarN igDragScalarN;
@@ -1474,7 +2501,9 @@ __gshared
 	da_igGetScrollX igGetScrollX;
 	da_igGetKeyIndex igGetKeyIndex;
 	da_igGetOverlayDrawList igGetOverlayDrawList;
-	da_igGetID igGetID;
+	da_igGetIDStr igGetIDStr;
+	da_igGetIDRange igGetIDRange;
+	da_igGetIDPtr igGetIDPtr;
 	da_ImFontAtlas_GetGlyphRangesJapanese ImFontAtlas_GetGlyphRangesJapanese;
 	da_ImDrawData_ScaleClipRects ImDrawData_ScaleClipRects;
 	da_ImDrawData_DeIndexAllBuffers ImDrawData_DeIndexAllBuffers;
@@ -1487,21 +2516,26 @@ __gshared
 	da_ImDrawList_UpdateClipRect ImDrawList_UpdateClipRect;
 	da_ImDrawList_PrimVtx ImDrawList_PrimVtx;
 	da_igGetColorU32 igGetColorU32;
+	da_igGetColorU32Vec4 igGetColorU32Vec4;
+	da_igGetColorU32U32 igGetColorU32U32;
 	da_igVSliderInt igVSliderInt;
 	da_igInvisibleButton igInvisibleButton;
 	da_igInputInt2 igInputInt2;
 	da_ImDrawList_PrimRect ImDrawList_PrimRect;
 	da_ImDrawList_AddRectFilled ImDrawList_AddRectFilled;
 	da_ImDrawList_ClearFreeMemory ImDrawList_ClearFreeMemory;
+	da_ImGuiListClipper_destroy ImGuiListClipper_destroy;
 	da_ImDrawList_CloneOutput ImDrawList_CloneOutput;
 	da_igSetNextTreeNodeOpen igSetNextTreeNodeOpen;
 	da_igLogToTTY igLogToTTY;
+	da_GlyphRangesBuilder_BuildRanges GlyphRangesBuilder_BuildRanges;
 	da_igSetTooltipV igSetTooltipV;
 	da_igEndGroup igEndGroup;
 	da_igGetIO igGetIO;
 	da_igDragInt4 igDragInt4;
 	da_igNextColumn igNextColumn;
 	da_ImDrawList_AddRect ImDrawList_AddRect;
+	da_TextRange_split TextRange_split;
 	da_igSetCursorPos igSetCursorPos;
 	da_igBeginPopupModal igBeginPopupModal;
 	da_igSliderInt4 igSliderInt4;
@@ -1514,6 +2548,7 @@ __gshared
 	da_igGetTextLineHeight igGetTextLineHeight;
 	da_igSeparator igSeparator;
 	da_igBeginChild igBeginChild;
+	da_igBeginChildID igBeginChildID;
 	da_igIsWindowAppearing igIsWindowAppearing;
 	da_igIsMouseClicked igIsMouseClicked;
 	da_igCalcItemWidth igCalcItemWidth;
@@ -1538,6 +2573,7 @@ __gshared
 	da_igIsWindowCollapsed igIsWindowCollapsed;
 	da_ImDrawList_AddImage ImDrawList_AddImage;
 	da_ImDrawList_AddText ImDrawList_AddText;
+	da_ImDrawList_AddTextFontPtr ImDrawList_AddTextFontPtr;
 	da_igSetNextWindowFocus igSetNextWindowFocus;
 	da_igSameLine igSameLine;
 	da_igBegin igBegin;
@@ -1562,13 +2598,21 @@ __gshared
 	da_ImDrawList_GetClipRectMin ImDrawList_GetClipRectMin;
 	da_igInputTextMultiline igInputTextMultiline;
 	da_igSelectable igSelectable;
-	da_igListBox igListBox;
+	da_igSelectableBoolPtr igSelectableBoolPtr;
+	da_igListBoxStr_arr igListBoxStr_arr;
+	da_igListBoxFnPtr igListBoxFnPtr;
 	da_ImDrawList_PopTextureID ImDrawList_PopTextureID;
 	da_igSetWindowFocus igSetWindowFocus;
+	da_igSetWindowFocusStr igSetWindowFocusStr;
 	da_igInputFloat4 igInputFloat4;
+	da_ImDrawList_ImDrawList ImDrawList_ImDrawList;
 	da_igGetVersion igGetVersion;
 	da_igEndCombo igEndCombo;
-	da_igPushID igPushID;
+	da_ImDrawCmd_ImDrawCmd ImDrawCmd_ImDrawCmd;
+	da_igPushIDStr igPushIDStr;
+	da_igPushIDRange igPushIDRange;
+	da_igPushIDPtr igPushIDPtr;
+	da_igPushIDInt igPushIDInt;
 	da_ImGuiListClipper_End ImGuiListClipper_End;
 	da_ImGuiListClipper_Begin ImGuiListClipper_Begin;
 	da_igGetDragDropPayload igGetDragDropPayload;
@@ -1577,6 +2621,7 @@ __gshared
 	da_ImGuiListClipper_Step ImGuiListClipper_Step;
 	da_igText igText;
 	da_igBeginMenu igBeginMenu;
+	da_ImGuiListClipper_ImGuiListClipper ImGuiListClipper_ImGuiListClipper;
 	da_ImGuiStorage_GetFloatRef ImGuiStorage_GetFloatRef;
 	da_igEndTooltip igEndTooltip;
 	da_igTextV igTextV;
@@ -1586,12 +2631,15 @@ __gshared
 	da_ImGuiPayload_IsDataType ImGuiPayload_IsDataType;
 	da_igPushClipRect igPushClipRect;
 	da_igSetColumnWidth igSetColumnWidth;
+	da_ImGuiPayload_ImGuiPayload ImGuiPayload_ImGuiPayload;
 	da_igBeginMainMenuBar igBeginMainMenuBar;
+	da_CustomRect_CustomRect CustomRect_CustomRect;
 	da_ImGuiInputTextCallbackData_InsertChars ImGuiInputTextCallbackData_InsertChars;
 	da_ImGuiStorage_GetFloat ImGuiStorage_GetFloat;
 	da_ImFontAtlas_GetMouseCursorTexData ImFontAtlas_GetMouseCursorTexData;
 	da_igVSliderScalar igVSliderScalar;
 	da_ImGuiStorage_GetVoidPtrRef ImGuiStorage_GetVoidPtrRef;
+	da_ImFontConfig_destroy ImFontConfig_destroy;
 	da_igStyleColorsLight igStyleColorsLight;
 	da_igSliderFloat3 igSliderFloat3;
 	da_igSetAllocatorFunctions igSetAllocatorFunctions;
@@ -1609,21 +2657,29 @@ __gshared
 	da_ImGuiStorage_SetInt ImGuiStorage_SetInt;
 	da_igLabelTextV igLabelTextV;
 	da_igGetFrameHeightWithSpacing igGetFrameHeightWithSpacing;
-	da_igTreeNodeEx igTreeNodeEx;
+	da_igTreeNodeExStr igTreeNodeExStr;
+	da_igTreeNodeExStrStr igTreeNodeExStrStr;
+	da_igTreeNodeExPtr igTreeNodeExPtr;
 	da_igCloseCurrentPopup igCloseCurrentPopup;
 	da_ImGuiTextBuffer_clear ImGuiTextBuffer_clear;
 	da_ImGuiStorage_Clear ImGuiStorage_Clear;
+	da_Pair_PairInt Pair_PairInt;
+	da_Pair_PairFloat Pair_PairFloat;
+	da_Pair_PairPtr Pair_PairPtr;
 	da_ImGuiTextBuffer_appendf ImGuiTextBuffer_appendf;
 	da_ImGuiTextBuffer_c_str ImGuiTextBuffer_c_str;
 	da_ImGuiTextBuffer_reserve ImGuiTextBuffer_reserve;
 	da_ImGuiTextBuffer_empty ImGuiTextBuffer_empty;
+	da_ImVec4_destroy ImVec4_destroy;
 	da_igSliderScalar igSliderScalar;
-	da_igTreePush igTreePush;
+	da_igTreePushStr igTreePushStr;
+	da_igTreePushPtr igTreePushPtr;
 	da_igListBoxFooter igListBoxFooter;
 	da_igTextDisabled igTextDisabled;
 	da_igIsItemHovered igIsItemHovered;
 	da_ImDrawList_PrimWriteVtx ImDrawList_PrimWriteVtx;
 	da_igBullet igBullet;
+	da_ImGuiIO_ImGuiIO ImGuiIO_ImGuiIO;
 	da_igInputInt3 igInputInt3;
 	da_TextRange_end TextRange_end;
 	da_igStyleColorsDark igStyleColorsDark;
@@ -1631,6 +2687,8 @@ __gshared
 	da_igSetWindowFontScale igSetWindowFontScale;
 	da_igSliderInt igSliderInt;
 	da_TextRange_begin TextRange_begin;
+	da_TextRange_TextRange TextRange_TextRange;
+	da_TextRange_TextRangeStr TextRange_TextRangeStr;
 	da_igSetNextWindowPos igSetNextWindowPos;
 	da_igDragInt3 igDragInt3;
 	da_igOpenPopup igOpenPopup;
@@ -1640,16 +2698,21 @@ __gshared
 	da_igGetDrawListSharedData igGetDrawListSharedData;
 	da_ImGuiTextFilter_Draw ImGuiTextFilter_Draw;
 	da_igIsItemActive igIsItemActive;
+	da_ImGuiTextFilter_ImGuiTextFilter ImGuiTextFilter_ImGuiTextFilter;
+	da_ImGuiOnceUponAFrame_ImGuiOnceUponAFrame ImGuiOnceUponAFrame_ImGuiOnceUponAFrame;
 	da_igBeginDragDropTarget igBeginDragDropTarget;
 	da_TextRange_empty TextRange_empty;
 	da_ImGuiPayload_IsDelivery ImGuiPayload_IsDelivery;
 	da_ImGuiIO_AddInputCharacter ImGuiIO_AddInputCharacter;
 	da_ImDrawList_AddImageRounded ImDrawList_AddImageRounded;
+	da_ImGuiStyle_ImGuiStyle ImGuiStyle_ImGuiStyle;
+	da_igPushStyleColorU32 igPushStyleColorU32;
 	da_igPushStyleColor igPushStyleColor;
 	da_igGetContentRegionMax igGetContentRegionMax;
 	da_igBeginChildFrame igBeginChildFrame;
 	da_igSaveIniSettingsToDisk igSaveIniSettingsToDisk;
 	da_ImFont_ClearOutputData ImFont_ClearOutputData;
+	da_ImColor_destroy ImColor_destroy;
 	da_ImDrawList_PrimQuadUV ImDrawList_PrimQuadUV;
 	da_igEndDragDropTarget igEndDragDropTarget;
 	da_ImFontAtlas_GetGlyphRangesKorean ImFontAtlas_GetGlyphRangesKorean;
@@ -1667,12 +2730,19 @@ __gshared
 	da_ImDrawList_PathClear ImDrawList_PathClear;
 	da_igBeginGroup igBeginGroup;
 	da_igColorConvertHSVtoRGB igColorConvertHSVtoRGB;
+	da_ImColor_ImColor ImColor_ImColor;
+	da_ImColor_ImColorInt ImColor_ImColorInt;
+	da_ImColor_ImColorU32 ImColor_ImColorU32;
+	da_ImColor_ImColorFloat ImColor_ImColorFloat;
+	da_ImColor_ImColorVec4 ImColor_ImColorVec4;
 	da_igVSliderFloat igVSliderFloat;
 	da_igColorConvertU32ToFloat4 igColorConvertU32ToFloat4;
 	da_igPopTextWrapPos igPopTextWrapPos;
 	da_ImGuiTextFilter_Clear ImGuiTextFilter_Clear;
+	da_GlyphRangesBuilder_destroy GlyphRangesBuilder_destroy;
 	da_igGetColumnWidth igGetColumnWidth;
 	da_igEndMenuBar igEndMenuBar;
+	da_ImGuiTextFilter_destroy ImGuiTextFilter_destroy;
 	da_igGetStyleColorName igGetStyleColorName;
 	da_igIsMouseDragging igIsMouseDragging;
 	da_ImDrawList_PrimWriteIdx ImDrawList_PrimWriteIdx;
@@ -1686,6 +2756,7 @@ __gshared
 	da_igSetItemAllowOverlap igSetItemAllowOverlap;
 	da_igEndChild igEndChild;
 	da_igCollapsingHeader igCollapsingHeader;
+	da_igCollapsingHeaderBoolPtr igCollapsingHeaderBoolPtr;
 	da_igTextDisabledV igTextDisabledV;
 	da_igDragFloatRange2 igDragFloatRange2;
 	da_igSetMouseCursor igSetMouseCursor;
@@ -1701,14 +2772,18 @@ __gshared
 	da_igEndMainMenuBar igEndMainMenuBar;
 	da_igSetCursorPosX igSetCursorPosX;
 	da_igGetMouseCursor igGetMouseCursor;
-	da_igMenuItem igMenuItem;
+	da_igMenuItemBool igMenuItemBool;
+	da_igMenuItemBoolPtr igMenuItemBoolPtr;
 	da_igGetScrollY igGetScrollY;
 	da_igPushAllowKeyboardFocus igPushAllowKeyboardFocus;
 	da_ImGuiTextBuffer_begin ImGuiTextBuffer_begin;
 	da_igSetCursorPosY igSetCursorPosY;
-	da_igSetWindowPos igSetWindowPos;
+	da_igSetWindowPosVec2 igSetWindowPosVec2;
+	da_igSetWindowPosStr igSetWindowPosStr;
 	da_igGetCursorPosY igGetCursorPosY;
 	da_ImFontAtlas_AddCustomRectFontGlyph ImFontAtlas_AddCustomRectFontGlyph;
+	da_ImVec2_ImVec2 ImVec2_ImVec2;
+	da_ImVec2_ImVec2Float ImVec2_ImVec2Float;
 	da_igBulletTextV igBulletTextV;
 	da_igGetContentRegionAvailWidth igGetContentRegionAvailWidth;
 	da_igEnd igEnd;
@@ -1729,7 +2804,9 @@ __gshared
 	da_ImDrawList_PathLineTo ImDrawList_PathLineTo;
 	da_igStyleColorsClassic igStyleColorsClassic;
 	da_igSliderFloat igSliderFloat;
+	da_ImFont_destroy ImFont_destroy;
 	da_igImage igImage;
+	da_ImGuiTextBuffer_ImGuiTextBuffer ImGuiTextBuffer_ImGuiTextBuffer;
 	da_igBulletText igBulletText;
 	da_igInputFloat2 igInputFloat2;
 	da_igGetTextLineHeightWithSpacing igGetTextLineHeightWithSpacing;
@@ -1737,20 +2814,27 @@ __gshared
 	da_igColorEdit4 igColorEdit4;
 	da_igLogToClipboard igLogToClipboard;
 	da_igBeginPopupContextWindow igBeginPopupContextWindow;
+	da_ImFontAtlas_ImFontAtlas ImFontAtlas_ImFontAtlas;
 	da_igDragScalar igDragScalar;
 	da_igSetItemDefaultFocus igSetItemDefaultFocus;
 	da_igCaptureMouseFromApp igCaptureMouseFromApp;
 	da_igIsAnyItemHovered igIsAnyItemHovered;
 	da_igPushFont igPushFont;
+	da_ImDrawData_destroy ImDrawData_destroy;
 	da_igTreePop igTreePop;
 	da_igGetWindowContentRegionWidth igGetWindowContentRegionWidth;
+	da_ImDrawData_ImDrawData ImDrawData_ImDrawData;
 	da_igInputText igInputText;
 	da_ImGuiTextBuffer_end ImGuiTextBuffer_end;
 	da_igPopStyleVar igPopStyleVar;
 	da_ImGuiTextFilter_PassFilter ImGuiTextFilter_PassFilter;
+	da_ImGuiOnceUponAFrame_destroy ImGuiOnceUponAFrame_destroy;
 	da_igGetFont igGetFont;
-	da_igTreeNode igTreeNode;
-	da_igTreeNodeV igTreeNodeV;
+	da_igTreeNodeStr igTreeNodeStr;
+	da_igTreeNodeStrStr igTreeNodeStrStr;
+	da_igTreeNodePtr igTreeNodePtr;
+	da_igTreeNodeVStr igTreeNodeVStr;
+	da_igTreeNodeVPtr igTreeNodeVPtr;
 	da_igGetScrollMaxX igGetScrollMaxX;
 	da_igSetTooltip igSetTooltip;
 	da_igGetContentRegionAvail igGetContentRegionAvail;
@@ -1795,6 +2879,8 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igTextUnformatted, "igTextUnformatted");
 			bindFunc(cast(void**)&igPopFont, "igPopFont");
 			bindFunc(cast(void**)&igCombo, "igCombo");
+			bindFunc(cast(void**)&igComboStr, "igComboStr");
+			bindFunc(cast(void**)&igComboFnPtr, "igComboFnPtr");
 			bindFunc(cast(void**)&igCaptureKeyboardFromApp, "igCaptureKeyboardFromApp");
 			bindFunc(cast(void**)&igIsWindowFocused, "igIsWindowFocused");
 			bindFunc(cast(void**)&igRender, "igRender");
@@ -1806,27 +2892,42 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igDebugCheckVersionAndDataLayout, "igDebugCheckVersionAndDataLayout");
 			bindFunc(cast(void**)&igSliderFloat4, "igSliderFloat4");
 			bindFunc(cast(void**)&igSetScrollY, "igSetScrollY");
+			bindFunc(cast(void**)&CustomRect_destroy, "CustomRect_destroy");
 			bindFunc(cast(void**)&igGetStateStorage, "igGetStateStorage");
 			bindFunc(cast(void**)&igSetColorEditOptions, "igSetColorEditOptions");
+			bindFunc(cast(void**)&ImFontAtlas_destroy, "ImFontAtlas_destroy");
 			bindFunc(cast(void**)&ImGuiStorage_GetBoolRef, "ImGuiStorage_GetBoolRef");
 			bindFunc(cast(void**)&igInputScalarN, "igInputScalarN");
 			bindFunc(cast(void**)&igColorPicker4, "igColorPicker4");
+			bindFunc(cast(void**)&ImGuiInputTextCallbackData_destroy, "ImGuiInputTextCallbackData_destroy");
 			bindFunc(cast(void**)&igSetScrollFromPosY, "igSetScrollFromPosY");
+			bindFunc(cast(void**)&ImDrawCmd_destroy, "ImDrawCmd_destroy");
 			bindFunc(cast(void**)&ImDrawList_Clear, "ImDrawList_Clear");
 			bindFunc(cast(void**)&igGetStyleColorVec4, "igGetStyleColorVec4");
 			bindFunc(cast(void**)&igGetClipboardText, "igGetClipboardText");
 			bindFunc(cast(void**)&igIsMouseHoveringRect, "igIsMouseHoveringRect");
+			bindFunc(cast(void**)&ImVec4_ImVec4, "ImVec4_ImVec4");
+			bindFunc(cast(void**)&ImVec4_ImVec4Float, "ImVec4_ImVec4Float");
+			bindFunc(cast(void**)&ImGuiPayload_destroy, "ImGuiPayload_destroy");
 			bindFunc(cast(void**)&ImColor_SetHSV, "ImColor_SetHSV");
+			bindFunc(cast(void**)&Pair_destroy, "Pair_destroy");
 			bindFunc(cast(void**)&igDragFloat3, "igDragFloat3");
 			bindFunc(cast(void**)&ImDrawList_AddPolyline, "ImDrawList_AddPolyline");
+			bindFunc(cast(void**)&ImGuiTextBuffer_destroy, "ImGuiTextBuffer_destroy");
 			bindFunc(cast(void**)&igCalcTextSize, "igCalcTextSize");
 			bindFunc(cast(void**)&igSetStateStorage, "igSetStateStorage");
-			bindFunc(cast(void**)&igValue, "igValue");
+			bindFunc(cast(void**)&igValueBool, "igValueBool");
+			bindFunc(cast(void**)&igValueInt, "igValueInt");
+			bindFunc(cast(void**)&igValueUint, "igValueUint");
+			bindFunc(cast(void**)&igValueFloat, "igValueFloat");
 			bindFunc(cast(void**)&igColumns, "igColumns");
 			bindFunc(cast(void**)&ImGuiTextFilter_Build, "ImGuiTextFilter_Build");
+			bindFunc(cast(void**)&ImGuiIO_destroy, "ImGuiIO_destroy");
 			bindFunc(cast(void**)&igGetItemRectMax, "igGetItemRectMax");
+			bindFunc(cast(void**)&ImGuiStyle_destroy, "ImGuiStyle_destroy");
 			bindFunc(cast(void**)&igIsItemDeactivated, "igIsItemDeactivated");
-			bindFunc(cast(void**)&igPushStyleVar, "igPushStyleVar");
+			bindFunc(cast(void**)&igPushStyleVarFloat, "igPushStyleVarFloat");
+			bindFunc(cast(void**)&igPushStyleVarVec2, "igPushStyleVarVec2");
 			bindFunc(cast(void**)&igSaveIniSettingsToMemory, "igSaveIniSettingsToMemory");
 			bindFunc(cast(void**)&ImGuiTextBuffer_size, "ImGuiTextBuffer_size");
 			bindFunc(cast(void**)&igDragIntRange2, "igDragIntRange2");
@@ -1834,6 +2935,7 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImFontAtlas_AddFontFromMemoryCompressedBase85TTF, "ImFontAtlas_AddFontFromMemoryCompressedBase85TTF");
 			bindFunc(cast(void**)&igPopAllowKeyboardFocus, "igPopAllowKeyboardFocus");
 			bindFunc(cast(void**)&igLoadIniSettingsFromDisk, "igLoadIniSettingsFromDisk");
+			bindFunc(cast(void**)&ImVec2_destroy, "ImVec2_destroy");
 			bindFunc(cast(void**)&igGetCursorStartPos, "igGetCursorStartPos");
 			bindFunc(cast(void**)&igSetCursorScreenPos, "igSetCursorScreenPos");
 			bindFunc(cast(void**)&ImFont_AddRemapChar, "ImFont_AddRemapChar");
@@ -1842,6 +2944,8 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImFont_GrowIndex, "ImFont_GrowIndex");
 			bindFunc(cast(void**)&ImFont_RenderText, "ImFont_RenderText");
 			bindFunc(cast(void**)&igIsRectVisible, "igIsRectVisible");
+			bindFunc(cast(void**)&igIsRectVisibleVec2, "igIsRectVisibleVec2");
+			bindFunc(cast(void**)&ImDrawList_destroy, "ImDrawList_destroy");
 			bindFunc(cast(void**)&ImFontAtlas_Build, "ImFontAtlas_Build");
 			bindFunc(cast(void**)&igLabelText, "igLabelText");
 			bindFunc(cast(void**)&ImFont_CalcWordWrapPositionA, "ImFont_CalcWordWrapPositionA");
@@ -1855,6 +2959,7 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igSmallButton, "igSmallButton");
 			bindFunc(cast(void**)&igOpenPopupOnItemClick, "igOpenPopupOnItemClick");
 			bindFunc(cast(void**)&igIsAnyMouseDown, "igIsAnyMouseDown");
+			bindFunc(cast(void**)&GlyphRangesBuilder_GlyphRangesBuilder, "GlyphRangesBuilder_GlyphRangesBuilder");
 			bindFunc(cast(void**)&ImFont_IsLoaded, "ImFont_IsLoaded");
 			bindFunc(cast(void**)&ImFont_GetCharAdvance, "ImFont_GetCharAdvance");
 			bindFunc(cast(void**)&ImFont_SetFallbackChar, "ImFont_SetFallbackChar");
@@ -1864,7 +2969,8 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igEndFrame, "igEndFrame");
 			bindFunc(cast(void**)&igSliderFloat2, "igSliderFloat2");
 			bindFunc(cast(void**)&ImFont_RenderChar, "ImFont_RenderChar");
-			bindFunc(cast(void**)&igRadioButton, "igRadioButton");
+			bindFunc(cast(void**)&igRadioButtonBool, "igRadioButtonBool");
+			bindFunc(cast(void**)&igRadioButtonIntPtr, "igRadioButtonIntPtr");
 			bindFunc(cast(void**)&ImDrawList_PushClipRect, "ImDrawList_PushClipRect");
 			bindFunc(cast(void**)&igLoadIniSettingsFromMemory, "igLoadIniSettingsFromMemory");
 			bindFunc(cast(void**)&igIsItemDeactivatedAfterEdit, "igIsItemDeactivatedAfterEdit");
@@ -1873,9 +2979,11 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImGuiPayload_Clear, "ImGuiPayload_Clear");
 			bindFunc(cast(void**)&igNewLine, "igNewLine");
 			bindFunc(cast(void**)&igIsItemFocused, "igIsItemFocused");
+			bindFunc(cast(void**)&ImFont_ImFont, "ImFont_ImFont");
 			bindFunc(cast(void**)&igSliderInt2, "igSliderInt2");
 			bindFunc(cast(void**)&ImGuiStorage_SetAllInt, "ImGuiStorage_SetAllInt");
-			bindFunc(cast(void**)&igSetWindowSize, "igSetWindowSize");
+			bindFunc(cast(void**)&igSetWindowSizeVec2, "igSetWindowSizeVec2");
+			bindFunc(cast(void**)&igSetWindowSizeStr, "igSetWindowSizeStr");
 			bindFunc(cast(void**)&igInputFloat, "igInputFloat");
 			bindFunc(cast(void**)&ImFontAtlas_CalcCustomRectUV, "ImFontAtlas_CalcCustomRectUV");
 			bindFunc(cast(void**)&ImFontAtlas_GetCustomRectByIndex, "ImFontAtlas_GetCustomRectByIndex");
@@ -1891,12 +2999,14 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImDrawList_UpdateTextureID, "ImDrawList_UpdateTextureID");
 			bindFunc(cast(void**)&CustomRect_IsPacked, "CustomRect_IsPacked");
 			bindFunc(cast(void**)&ImGuiInputTextCallbackData_HasSelection, "ImGuiInputTextCallbackData_HasSelection");
-			bindFunc(cast(void**)&igSetWindowCollapsed, "igSetWindowCollapsed");
+			bindFunc(cast(void**)&igSetWindowCollapsedBool, "igSetWindowCollapsedBool");
+			bindFunc(cast(void**)&igSetWindowCollapsedStr, "igSetWindowCollapsedStr");
 			bindFunc(cast(void**)&igGetMouseDragDelta, "igGetMouseDragDelta");
 			bindFunc(cast(void**)&igAcceptDragDropPayload, "igAcceptDragDropPayload");
 			bindFunc(cast(void**)&igBeginDragDropSource, "igBeginDragDropSource");
 			bindFunc(cast(void**)&ImDrawList_AddCallback, "ImDrawList_AddCallback");
 			bindFunc(cast(void**)&igPlotLines, "igPlotLines");
+			bindFunc(cast(void**)&igPlotLinesFnPtr, "igPlotLinesFnPtr");
 			bindFunc(cast(void**)&ImFontAtlas_IsBuilt, "ImFontAtlas_IsBuilt");
 			bindFunc(cast(void**)&igTextWrapped, "igTextWrapped");
 			bindFunc(cast(void**)&GlyphRangesBuilder_AddRanges, "GlyphRangesBuilder_AddRanges");
@@ -1904,7 +3014,8 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&GlyphRangesBuilder_SetBit, "GlyphRangesBuilder_SetBit");
 			bindFunc(cast(void**)&ImDrawList_PathFillConvex, "ImDrawList_PathFillConvex");
 			bindFunc(cast(void**)&ImFont_GetDebugName, "ImFont_GetDebugName");
-			bindFunc(cast(void**)&igListBoxHeader, "igListBoxHeader");
+			bindFunc(cast(void**)&igListBoxHeaderVec2, "igListBoxHeaderVec2");
+			bindFunc(cast(void**)&igListBoxHeaderInt, "igListBoxHeaderInt");
 			bindFunc(cast(void**)&igPopClipRect, "igPopClipRect");
 			bindFunc(cast(void**)&ImFontAtlas_GetGlyphRangesThai, "ImFontAtlas_GetGlyphRangesThai");
 			bindFunc(cast(void**)&ImFontAtlas_GetGlyphRangesCyrillic, "ImFontAtlas_GetGlyphRangesCyrillic");
@@ -1913,19 +3024,23 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igCheckboxFlags, "igCheckboxFlags");
 			bindFunc(cast(void**)&ImFontAtlas_GetGlyphRangesChineseFull, "ImFontAtlas_GetGlyphRangesChineseFull");
 			bindFunc(cast(void**)&igIsWindowHovered, "igIsWindowHovered");
-			bindFunc(cast(void**)&igPlotHistogram, "igPlotHistogram");
+			bindFunc(cast(void**)&ImFontConfig_ImFontConfig, "ImFontConfig_ImFontConfig");
+			bindFunc(cast(void**)&igPlotHistogramFloatPtr, "igPlotHistogramFloatPtr");
+			bindFunc(cast(void**)&igPlotHistogramFnPtr, "igPlotHistogramFnPtr");
 			bindFunc(cast(void**)&igBeginPopupContextVoid, "igBeginPopupContextVoid");
 			bindFunc(cast(void**)&igShowStyleEditor, "igShowStyleEditor");
 			bindFunc(cast(void**)&igShowUserGuide, "igShowUserGuide");
 			bindFunc(cast(void**)&igCheckbox, "igCheckbox");
 			bindFunc(cast(void**)&igGetWindowPos, "igGetWindowPos");
 			bindFunc(cast(void**)&ImFontAtlas_GetGlyphRangesDefault, "ImFontAtlas_GetGlyphRangesDefault");
+			bindFunc(cast(void**)&ImGuiInputTextCallbackData_ImGuiInputTextCallbackData, "ImGuiInputTextCallbackData_ImGuiInputTextCallbackData");
 			bindFunc(cast(void**)&ImFontAtlas_SetTexID, "ImFontAtlas_SetTexID");
 			bindFunc(cast(void**)&igTextColored, "igTextColored");
 			bindFunc(cast(void**)&igLogToFile, "igLogToFile");
 			bindFunc(cast(void**)&igButton, "igButton");
 			bindFunc(cast(void**)&igIsItemEdited, "igIsItemEdited");
-			bindFunc(cast(void**)&igTreeNodeExV, "igTreeNodeExV");
+			bindFunc(cast(void**)&igTreeNodeExVStr, "igTreeNodeExVStr");
+			bindFunc(cast(void**)&igTreeNodeExVPtr, "igTreeNodeExVPtr");
 			bindFunc(cast(void**)&ImDrawList_PushTextureID, "ImDrawList_PushTextureID");
 			bindFunc(cast(void**)&igTreeAdvanceToLabelPos, "igTreeAdvanceToLabelPos");
 			bindFunc(cast(void**)&ImGuiInputTextCallbackData_DeleteChars, "ImGuiInputTextCallbackData_DeleteChars");
@@ -1937,6 +3052,7 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImFontAtlas_ClearFonts, "ImFontAtlas_ClearFonts");
 			bindFunc(cast(void**)&igDummy, "igDummy");
 			bindFunc(cast(void**)&ImFontAtlas_ClearTexData, "ImFontAtlas_ClearTexData");
+			bindFunc(cast(void**)&TextRange_destroy, "TextRange_destroy");
 			bindFunc(cast(void**)&igGetColumnsCount, "igGetColumnsCount");
 			bindFunc(cast(void**)&igPopButtonRepeat, "igPopButtonRepeat");
 			bindFunc(cast(void**)&igDragScalarN, "igDragScalarN");
@@ -1959,7 +3075,9 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igGetScrollX, "igGetScrollX");
 			bindFunc(cast(void**)&igGetKeyIndex, "igGetKeyIndex");
 			bindFunc(cast(void**)&igGetOverlayDrawList, "igGetOverlayDrawList");
-			bindFunc(cast(void**)&igGetID, "igGetID");
+			bindFunc(cast(void**)&igGetIDStr, "igGetIDStr");
+			bindFunc(cast(void**)&igGetIDRange, "igGetIDRange");
+			bindFunc(cast(void**)&igGetIDPtr, "igGetIDPtr");
 			bindFunc(cast(void**)&ImFontAtlas_GetGlyphRangesJapanese, "ImFontAtlas_GetGlyphRangesJapanese");
 			bindFunc(cast(void**)&ImDrawData_ScaleClipRects, "ImDrawData_ScaleClipRects");
 			bindFunc(cast(void**)&ImDrawData_DeIndexAllBuffers, "ImDrawData_DeIndexAllBuffers");
@@ -1972,21 +3090,26 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImDrawList_UpdateClipRect, "ImDrawList_UpdateClipRect");
 			bindFunc(cast(void**)&ImDrawList_PrimVtx, "ImDrawList_PrimVtx");
 			bindFunc(cast(void**)&igGetColorU32, "igGetColorU32");
+			bindFunc(cast(void**)&igGetColorU32Vec4, "igGetColorU32Vec4");
+			bindFunc(cast(void**)&igGetColorU32U32, "igGetColorU32U32");
 			bindFunc(cast(void**)&igVSliderInt, "igVSliderInt");
 			bindFunc(cast(void**)&igInvisibleButton, "igInvisibleButton");
 			bindFunc(cast(void**)&igInputInt2, "igInputInt2");
 			bindFunc(cast(void**)&ImDrawList_PrimRect, "ImDrawList_PrimRect");
 			bindFunc(cast(void**)&ImDrawList_AddRectFilled, "ImDrawList_AddRectFilled");
 			bindFunc(cast(void**)&ImDrawList_ClearFreeMemory, "ImDrawList_ClearFreeMemory");
+			bindFunc(cast(void**)&ImGuiListClipper_destroy, "ImGuiListClipper_destroy");
 			bindFunc(cast(void**)&ImDrawList_CloneOutput, "ImDrawList_CloneOutput");
 			bindFunc(cast(void**)&igSetNextTreeNodeOpen, "igSetNextTreeNodeOpen");
 			bindFunc(cast(void**)&igLogToTTY, "igLogToTTY");
+			bindFunc(cast(void**)&GlyphRangesBuilder_BuildRanges, "GlyphRangesBuilder_BuildRanges");
 			bindFunc(cast(void**)&igSetTooltipV, "igSetTooltipV");
 			bindFunc(cast(void**)&igEndGroup, "igEndGroup");
 			bindFunc(cast(void**)&igGetIO, "igGetIO");
 			bindFunc(cast(void**)&igDragInt4, "igDragInt4");
 			bindFunc(cast(void**)&igNextColumn, "igNextColumn");
 			bindFunc(cast(void**)&ImDrawList_AddRect, "ImDrawList_AddRect");
+			bindFunc(cast(void**)&TextRange_split, "TextRange_split");
 			bindFunc(cast(void**)&igSetCursorPos, "igSetCursorPos");
 			bindFunc(cast(void**)&igBeginPopupModal, "igBeginPopupModal");
 			bindFunc(cast(void**)&igSliderInt4, "igSliderInt4");
@@ -1999,6 +3122,7 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igGetTextLineHeight, "igGetTextLineHeight");
 			bindFunc(cast(void**)&igSeparator, "igSeparator");
 			bindFunc(cast(void**)&igBeginChild, "igBeginChild");
+			bindFunc(cast(void**)&igBeginChildID, "igBeginChildID");
 			bindFunc(cast(void**)&igIsWindowAppearing, "igIsWindowAppearing");
 			bindFunc(cast(void**)&igIsMouseClicked, "igIsMouseClicked");
 			bindFunc(cast(void**)&igCalcItemWidth, "igCalcItemWidth");
@@ -2023,6 +3147,7 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igIsWindowCollapsed, "igIsWindowCollapsed");
 			bindFunc(cast(void**)&ImDrawList_AddImage, "ImDrawList_AddImage");
 			bindFunc(cast(void**)&ImDrawList_AddText, "ImDrawList_AddText");
+			bindFunc(cast(void**)&ImDrawList_AddTextFontPtr, "ImDrawList_AddTextFontPtr");
 			bindFunc(cast(void**)&igSetNextWindowFocus, "igSetNextWindowFocus");
 			bindFunc(cast(void**)&igSameLine, "igSameLine");
 			bindFunc(cast(void**)&igBegin, "igBegin");
@@ -2047,13 +3172,21 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImDrawList_GetClipRectMin, "ImDrawList_GetClipRectMin");
 			bindFunc(cast(void**)&igInputTextMultiline, "igInputTextMultiline");
 			bindFunc(cast(void**)&igSelectable, "igSelectable");
-			bindFunc(cast(void**)&igListBox, "igListBox");
+			bindFunc(cast(void**)&igSelectableBoolPtr, "igSelectableBoolPtr");
+			bindFunc(cast(void**)&igListBoxStr_arr, "igListBoxStr_arr");
+			bindFunc(cast(void**)&igListBoxFnPtr, "igListBoxFnPtr");
 			bindFunc(cast(void**)&ImDrawList_PopTextureID, "ImDrawList_PopTextureID");
 			bindFunc(cast(void**)&igSetWindowFocus, "igSetWindowFocus");
+			bindFunc(cast(void**)&igSetWindowFocusStr, "igSetWindowFocusStr");
 			bindFunc(cast(void**)&igInputFloat4, "igInputFloat4");
+			bindFunc(cast(void**)&ImDrawList_ImDrawList, "ImDrawList_ImDrawList");
 			bindFunc(cast(void**)&igGetVersion, "igGetVersion");
 			bindFunc(cast(void**)&igEndCombo, "igEndCombo");
-			bindFunc(cast(void**)&igPushID, "igPushID");
+			bindFunc(cast(void**)&ImDrawCmd_ImDrawCmd, "ImDrawCmd_ImDrawCmd");
+			bindFunc(cast(void**)&igPushIDStr, "igPushIDStr");
+			bindFunc(cast(void**)&igPushIDRange, "igPushIDRange");
+			bindFunc(cast(void**)&igPushIDPtr, "igPushIDPtr");
+			bindFunc(cast(void**)&igPushIDInt, "igPushIDInt");
 			bindFunc(cast(void**)&ImGuiListClipper_End, "ImGuiListClipper_End");
 			bindFunc(cast(void**)&ImGuiListClipper_Begin, "ImGuiListClipper_Begin");
 			bindFunc(cast(void**)&igGetDragDropPayload, "igGetDragDropPayload");
@@ -2062,6 +3195,7 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImGuiListClipper_Step, "ImGuiListClipper_Step");
 			bindFunc(cast(void**)&igText, "igText");
 			bindFunc(cast(void**)&igBeginMenu, "igBeginMenu");
+			bindFunc(cast(void**)&ImGuiListClipper_ImGuiListClipper, "ImGuiListClipper_ImGuiListClipper");
 			bindFunc(cast(void**)&ImGuiStorage_GetFloatRef, "ImGuiStorage_GetFloatRef");
 			bindFunc(cast(void**)&igEndTooltip, "igEndTooltip");
 			bindFunc(cast(void**)&igTextV, "igTextV");
@@ -2071,12 +3205,15 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImGuiPayload_IsDataType, "ImGuiPayload_IsDataType");
 			bindFunc(cast(void**)&igPushClipRect, "igPushClipRect");
 			bindFunc(cast(void**)&igSetColumnWidth, "igSetColumnWidth");
+			bindFunc(cast(void**)&ImGuiPayload_ImGuiPayload, "ImGuiPayload_ImGuiPayload");
 			bindFunc(cast(void**)&igBeginMainMenuBar, "igBeginMainMenuBar");
+			bindFunc(cast(void**)&CustomRect_CustomRect, "CustomRect_CustomRect");
 			bindFunc(cast(void**)&ImGuiInputTextCallbackData_InsertChars, "ImGuiInputTextCallbackData_InsertChars");
 			bindFunc(cast(void**)&ImGuiStorage_GetFloat, "ImGuiStorage_GetFloat");
 			bindFunc(cast(void**)&ImFontAtlas_GetMouseCursorTexData, "ImFontAtlas_GetMouseCursorTexData");
 			bindFunc(cast(void**)&igVSliderScalar, "igVSliderScalar");
 			bindFunc(cast(void**)&ImGuiStorage_GetVoidPtrRef, "ImGuiStorage_GetVoidPtrRef");
+			bindFunc(cast(void**)&ImFontConfig_destroy, "ImFontConfig_destroy");
 			bindFunc(cast(void**)&igStyleColorsLight, "igStyleColorsLight");
 			bindFunc(cast(void**)&igSliderFloat3, "igSliderFloat3");
 			bindFunc(cast(void**)&igSetAllocatorFunctions, "igSetAllocatorFunctions");
@@ -2094,21 +3231,29 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImGuiStorage_SetInt, "ImGuiStorage_SetInt");
 			bindFunc(cast(void**)&igLabelTextV, "igLabelTextV");
 			bindFunc(cast(void**)&igGetFrameHeightWithSpacing, "igGetFrameHeightWithSpacing");
-			bindFunc(cast(void**)&igTreeNodeEx, "igTreeNodeEx");
+			bindFunc(cast(void**)&igTreeNodeExStr, "igTreeNodeExStr");
+			bindFunc(cast(void**)&igTreeNodeExStrStr, "igTreeNodeExStrStr");
+			bindFunc(cast(void**)&igTreeNodeExPtr, "igTreeNodeExPtr");
 			bindFunc(cast(void**)&igCloseCurrentPopup, "igCloseCurrentPopup");
 			bindFunc(cast(void**)&ImGuiTextBuffer_clear, "ImGuiTextBuffer_clear");
 			bindFunc(cast(void**)&ImGuiStorage_Clear, "ImGuiStorage_Clear");
+			bindFunc(cast(void**)&Pair_PairInt, "Pair_PairInt");
+			bindFunc(cast(void**)&Pair_PairFloat, "Pair_PairFloat");
+			bindFunc(cast(void**)&Pair_PairPtr, "Pair_PairPtr");
 			bindFunc(cast(void**)&ImGuiTextBuffer_appendf, "ImGuiTextBuffer_appendf");
 			bindFunc(cast(void**)&ImGuiTextBuffer_c_str, "ImGuiTextBuffer_c_str");
 			bindFunc(cast(void**)&ImGuiTextBuffer_reserve, "ImGuiTextBuffer_reserve");
 			bindFunc(cast(void**)&ImGuiTextBuffer_empty, "ImGuiTextBuffer_empty");
+			bindFunc(cast(void**)&ImVec4_destroy, "ImVec4_destroy");
 			bindFunc(cast(void**)&igSliderScalar, "igSliderScalar");
-			bindFunc(cast(void**)&igTreePush, "igTreePush");
+			bindFunc(cast(void**)&igTreePushStr, "igTreePushStr");
+			bindFunc(cast(void**)&igTreePushPtr, "igTreePushPtr");
 			bindFunc(cast(void**)&igListBoxFooter, "igListBoxFooter");
 			bindFunc(cast(void**)&igTextDisabled, "igTextDisabled");
 			bindFunc(cast(void**)&igIsItemHovered, "igIsItemHovered");
 			bindFunc(cast(void**)&ImDrawList_PrimWriteVtx, "ImDrawList_PrimWriteVtx");
 			bindFunc(cast(void**)&igBullet, "igBullet");
+			bindFunc(cast(void**)&ImGuiIO_ImGuiIO, "ImGuiIO_ImGuiIO");
 			bindFunc(cast(void**)&igInputInt3, "igInputInt3");
 			bindFunc(cast(void**)&TextRange_end, "TextRange_end");
 			bindFunc(cast(void**)&igStyleColorsDark, "igStyleColorsDark");
@@ -2116,6 +3261,8 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igSetWindowFontScale, "igSetWindowFontScale");
 			bindFunc(cast(void**)&igSliderInt, "igSliderInt");
 			bindFunc(cast(void**)&TextRange_begin, "TextRange_begin");
+			bindFunc(cast(void**)&TextRange_TextRange, "TextRange_TextRange");
+			bindFunc(cast(void**)&TextRange_TextRangeStr, "TextRange_TextRangeStr");
 			bindFunc(cast(void**)&igSetNextWindowPos, "igSetNextWindowPos");
 			bindFunc(cast(void**)&igDragInt3, "igDragInt3");
 			bindFunc(cast(void**)&igOpenPopup, "igOpenPopup");
@@ -2125,16 +3272,21 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igGetDrawListSharedData, "igGetDrawListSharedData");
 			bindFunc(cast(void**)&ImGuiTextFilter_Draw, "ImGuiTextFilter_Draw");
 			bindFunc(cast(void**)&igIsItemActive, "igIsItemActive");
+			bindFunc(cast(void**)&ImGuiTextFilter_ImGuiTextFilter, "ImGuiTextFilter_ImGuiTextFilter");
+			bindFunc(cast(void**)&ImGuiOnceUponAFrame_ImGuiOnceUponAFrame, "ImGuiOnceUponAFrame_ImGuiOnceUponAFrame");
 			bindFunc(cast(void**)&igBeginDragDropTarget, "igBeginDragDropTarget");
 			bindFunc(cast(void**)&TextRange_empty, "TextRange_empty");
 			bindFunc(cast(void**)&ImGuiPayload_IsDelivery, "ImGuiPayload_IsDelivery");
 			bindFunc(cast(void**)&ImGuiIO_AddInputCharacter, "ImGuiIO_AddInputCharacter");
 			bindFunc(cast(void**)&ImDrawList_AddImageRounded, "ImDrawList_AddImageRounded");
+			bindFunc(cast(void**)&ImGuiStyle_ImGuiStyle, "ImGuiStyle_ImGuiStyle");
+			bindFunc(cast(void**)&igPushStyleColorU32, "igPushStyleColorU32");
 			bindFunc(cast(void**)&igPushStyleColor, "igPushStyleColor");
 			bindFunc(cast(void**)&igGetContentRegionMax, "igGetContentRegionMax");
 			bindFunc(cast(void**)&igBeginChildFrame, "igBeginChildFrame");
 			bindFunc(cast(void**)&igSaveIniSettingsToDisk, "igSaveIniSettingsToDisk");
 			bindFunc(cast(void**)&ImFont_ClearOutputData, "ImFont_ClearOutputData");
+			bindFunc(cast(void**)&ImColor_destroy, "ImColor_destroy");
 			bindFunc(cast(void**)&ImDrawList_PrimQuadUV, "ImDrawList_PrimQuadUV");
 			bindFunc(cast(void**)&igEndDragDropTarget, "igEndDragDropTarget");
 			bindFunc(cast(void**)&ImFontAtlas_GetGlyphRangesKorean, "ImFontAtlas_GetGlyphRangesKorean");
@@ -2152,12 +3304,19 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImDrawList_PathClear, "ImDrawList_PathClear");
 			bindFunc(cast(void**)&igBeginGroup, "igBeginGroup");
 			bindFunc(cast(void**)&igColorConvertHSVtoRGB, "igColorConvertHSVtoRGB");
+			bindFunc(cast(void**)&ImColor_ImColor, "ImColor_ImColor");
+			bindFunc(cast(void**)&ImColor_ImColorInt, "ImColor_ImColorInt");
+			bindFunc(cast(void**)&ImColor_ImColorU32, "ImColor_ImColorU32");
+			bindFunc(cast(void**)&ImColor_ImColorFloat, "ImColor_ImColorFloat");
+			bindFunc(cast(void**)&ImColor_ImColorVec4, "ImColor_ImColorVec4");
 			bindFunc(cast(void**)&igVSliderFloat, "igVSliderFloat");
 			bindFunc(cast(void**)&igColorConvertU32ToFloat4, "igColorConvertU32ToFloat4");
 			bindFunc(cast(void**)&igPopTextWrapPos, "igPopTextWrapPos");
 			bindFunc(cast(void**)&ImGuiTextFilter_Clear, "ImGuiTextFilter_Clear");
+			bindFunc(cast(void**)&GlyphRangesBuilder_destroy, "GlyphRangesBuilder_destroy");
 			bindFunc(cast(void**)&igGetColumnWidth, "igGetColumnWidth");
 			bindFunc(cast(void**)&igEndMenuBar, "igEndMenuBar");
+			bindFunc(cast(void**)&ImGuiTextFilter_destroy, "ImGuiTextFilter_destroy");
 			bindFunc(cast(void**)&igGetStyleColorName, "igGetStyleColorName");
 			bindFunc(cast(void**)&igIsMouseDragging, "igIsMouseDragging");
 			bindFunc(cast(void**)&ImDrawList_PrimWriteIdx, "ImDrawList_PrimWriteIdx");
@@ -2171,6 +3330,7 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igSetItemAllowOverlap, "igSetItemAllowOverlap");
 			bindFunc(cast(void**)&igEndChild, "igEndChild");
 			bindFunc(cast(void**)&igCollapsingHeader, "igCollapsingHeader");
+			bindFunc(cast(void**)&igCollapsingHeaderBoolPtr, "igCollapsingHeaderBoolPtr");
 			bindFunc(cast(void**)&igTextDisabledV, "igTextDisabledV");
 			bindFunc(cast(void**)&igDragFloatRange2, "igDragFloatRange2");
 			bindFunc(cast(void**)&igSetMouseCursor, "igSetMouseCursor");
@@ -2186,14 +3346,18 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igEndMainMenuBar, "igEndMainMenuBar");
 			bindFunc(cast(void**)&igSetCursorPosX, "igSetCursorPosX");
 			bindFunc(cast(void**)&igGetMouseCursor, "igGetMouseCursor");
-			bindFunc(cast(void**)&igMenuItem, "igMenuItem");
+			bindFunc(cast(void**)&igMenuItemBool, "igMenuItemBool");
+			bindFunc(cast(void**)&igMenuItemBoolPtr, "igMenuItemBoolPtr");
 			bindFunc(cast(void**)&igGetScrollY, "igGetScrollY");
 			bindFunc(cast(void**)&igPushAllowKeyboardFocus, "igPushAllowKeyboardFocus");
 			bindFunc(cast(void**)&ImGuiTextBuffer_begin, "ImGuiTextBuffer_begin");
 			bindFunc(cast(void**)&igSetCursorPosY, "igSetCursorPosY");
-			bindFunc(cast(void**)&igSetWindowPos, "igSetWindowPos");
+			bindFunc(cast(void**)&igSetWindowPosVec2, "igSetWindowPosVec2");
+			bindFunc(cast(void**)&igSetWindowPosStr, "igSetWindowPosStr");
 			bindFunc(cast(void**)&igGetCursorPosY, "igGetCursorPosY");
 			bindFunc(cast(void**)&ImFontAtlas_AddCustomRectFontGlyph, "ImFontAtlas_AddCustomRectFontGlyph");
+			bindFunc(cast(void**)&ImVec2_ImVec2, "ImVec2_ImVec2");
+			bindFunc(cast(void**)&ImVec2_ImVec2Float, "ImVec2_ImVec2Float");
 			bindFunc(cast(void**)&igBulletTextV, "igBulletTextV");
 			bindFunc(cast(void**)&igGetContentRegionAvailWidth, "igGetContentRegionAvailWidth");
 			bindFunc(cast(void**)&igEnd, "igEnd");
@@ -2214,7 +3378,9 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&ImDrawList_PathLineTo, "ImDrawList_PathLineTo");
 			bindFunc(cast(void**)&igStyleColorsClassic, "igStyleColorsClassic");
 			bindFunc(cast(void**)&igSliderFloat, "igSliderFloat");
+			bindFunc(cast(void**)&ImFont_destroy, "ImFont_destroy");
 			bindFunc(cast(void**)&igImage, "igImage");
+			bindFunc(cast(void**)&ImGuiTextBuffer_ImGuiTextBuffer, "ImGuiTextBuffer_ImGuiTextBuffer");
 			bindFunc(cast(void**)&igBulletText, "igBulletText");
 			bindFunc(cast(void**)&igInputFloat2, "igInputFloat2");
 			bindFunc(cast(void**)&igGetTextLineHeightWithSpacing, "igGetTextLineHeightWithSpacing");
@@ -2222,20 +3388,27 @@ final class DerelictImguiLoader : SharedLibLoader
 			bindFunc(cast(void**)&igColorEdit4, "igColorEdit4");
 			bindFunc(cast(void**)&igLogToClipboard, "igLogToClipboard");
 			bindFunc(cast(void**)&igBeginPopupContextWindow, "igBeginPopupContextWindow");
+			bindFunc(cast(void**)&ImFontAtlas_ImFontAtlas, "ImFontAtlas_ImFontAtlas");
 			bindFunc(cast(void**)&igDragScalar, "igDragScalar");
 			bindFunc(cast(void**)&igSetItemDefaultFocus, "igSetItemDefaultFocus");
 			bindFunc(cast(void**)&igCaptureMouseFromApp, "igCaptureMouseFromApp");
 			bindFunc(cast(void**)&igIsAnyItemHovered, "igIsAnyItemHovered");
 			bindFunc(cast(void**)&igPushFont, "igPushFont");
+			bindFunc(cast(void**)&ImDrawData_destroy, "ImDrawData_destroy");
 			bindFunc(cast(void**)&igTreePop, "igTreePop");
 			bindFunc(cast(void**)&igGetWindowContentRegionWidth, "igGetWindowContentRegionWidth");
+			bindFunc(cast(void**)&ImDrawData_ImDrawData, "ImDrawData_ImDrawData");
 			bindFunc(cast(void**)&igInputText, "igInputText");
 			bindFunc(cast(void**)&ImGuiTextBuffer_end, "ImGuiTextBuffer_end");
 			bindFunc(cast(void**)&igPopStyleVar, "igPopStyleVar");
 			bindFunc(cast(void**)&ImGuiTextFilter_PassFilter, "ImGuiTextFilter_PassFilter");
+			bindFunc(cast(void**)&ImGuiOnceUponAFrame_destroy, "ImGuiOnceUponAFrame_destroy");
 			bindFunc(cast(void**)&igGetFont, "igGetFont");
-			bindFunc(cast(void**)&igTreeNode, "igTreeNode");
-			bindFunc(cast(void**)&igTreeNodeV, "igTreeNodeV");
+			bindFunc(cast(void**)&igTreeNodeStr, "igTreeNodeStr");
+			bindFunc(cast(void**)&igTreeNodeStrStr, "igTreeNodeStrStr");
+			bindFunc(cast(void**)&igTreeNodePtr, "igTreeNodePtr");
+			bindFunc(cast(void**)&igTreeNodeVStr, "igTreeNodeVStr");
+			bindFunc(cast(void**)&igTreeNodeVPtr, "igTreeNodeVPtr");
 			bindFunc(cast(void**)&igGetScrollMaxX, "igGetScrollMaxX");
 			bindFunc(cast(void**)&igSetTooltip, "igSetTooltip");
 			bindFunc(cast(void**)&igGetContentRegionAvail, "igGetContentRegionAvail");

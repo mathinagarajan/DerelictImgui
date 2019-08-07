@@ -43,18 +43,64 @@ private
     import core.stdc.stdarg:va_list;
 }
 
+// Helpers macros to generate 32-bits encoded colors
+version(IMGUI_USE_BGRA_PACKED_COLOR) {
+    enum IM_COL32_R_SHIFT    = 16;
+    enum IM_COL32_G_SHIFT    = 8;
+    enum IM_COL32_B_SHIFT    = 0;
+    enum IM_COL32_A_SHIFT    = 24;
+    enum IM_COL32_A_MASK     = 0xFF000000;
+} else {
+    enum IM_COL32_R_SHIFT    = 0;
+    enum IM_COL32_G_SHIFT    = 8;
+    enum IM_COL32_B_SHIFT    = 16;
+    enum IM_COL32_A_SHIFT    = 24;
+    enum IM_COL32_A_MASK     = 0xFF000000;
+}
+uint IM_COL32(ubyte R, ubyte G, ubyte B, ubyte A = 255) {
+    return (
+            (cast(ImU32)(A)<<IM_COL32_A_SHIFT) | 
+            (cast(ImU32)(B)<<IM_COL32_B_SHIFT) | 
+            (cast(ImU32)(G)<<IM_COL32_G_SHIFT) | 
+            (cast(ImU32)(R)<<IM_COL32_R_SHIFT)
+            );
+}
+@property uint IM_COL32_WHITE() {
+    return IM_COL32(255,255,255,255);   // Opaque white = 0xFFFFFFFF
+}
+@property uint IM_COL32_BLACK() {
+    return IM_COL32(0,0,0,255);         // Opaque black
+}
+@property uint IM_COL32_BLACK_TRANS() {
+    return IM_COL32(0,0,0,0);           // Transparent black = 0x00000000
+}
+
 <%!
   import json
-  functions = json.load(open('../../../cimgui/generator/output/definitions.json'))
-  functions = {fname: function for fname, function in functions.items() if 'destructor' not in function[0] and 'constructor' not in function[0]}
-  functions = {fname: function for fname, function in functions.items() if function[0]['argsoriginal'].find('ImVector') == -1}
+  functionsWide = json.load(open('../../../cimgui/generator/output/definitions.json'))
+  functions = {}
+  for _, function_list in functionsWide.items():
+    for function in function_list:
+      fname = function.get('ov_cimguiname', function['cimguiname'])
+      if "_nonUDT" in fname:
+        continue
+      if 'destructor' in function:
+        function['funcname'] = 'destroy'
+        function['ret'] = 'void'
+      if 'constructor' in function:
+        function['ret'] = function['stname'] + '*'
+      if fname == 'igColorConvertRGBtoHSV' or fname == 'igColorConvertHSVtoRGB':
+        function['args'] = function['args'].replace('float out', 'float* out')
+      functions[fname] = function
+
   import re
-  def adjust_args(args):
+  def adjust_args(args, defaults):
     args = args.replace('((void *)0)','null')
     args = re.sub('const char\* const (\w*)\[\]', 'const char** \g<1>', args)
     args = re.sub('(\w*)&', '\g<1>', args)
     args = re.sub(' in(\W)', ' in_\g<1>', args)
     args = re.sub(' ref(\W)', ' ref_\g<1>', args)
+    args = re.sub(' out(\W)', ' out_\g<1>', args)
     args = re.sub('unsigned char', 'char', args)
     args = re.sub('unsigned int', 'uint', args)
     args = re.sub('float (\w*)\[(\d*)\]', 'float[\g<2>] \g<1>', args)
@@ -63,6 +109,15 @@ private
     args = re.sub('sizeof\(float\)', '4', args)
     args = args.replace('void*(*alloc_func)(size_t sz,void* user_data)', 'ImGuiAllocFunc')
     args = args.replace('void(*free_func)(void* ptr,void* user_data)', 'ImGuiFreeFunc')
+    args = args.replace('bool(*items_getter)(void* data,int idx,const char** out_text)', 'ImGuiItemGetter getter')
+    args = args.replace('float(*values_getter)(void* data,int idx)', 'ImGuiValuesGetter getter')
+
+    if len(defaults) > 0:
+        for argname, argvalue in defaults.items():
+            argvalue = argvalue.replace('((void *)0)', 'null')
+            argvalue = argvalue.replace('FLT_MAX', 'float.max')
+            argvalue = argvalue.replace('sizeof(float)', 'float.sizeof')
+            args = re.sub(' ' + argname + '(\W)', ' ' + argname + ' = ' + argvalue + '\g<1>', args)
 
     return args
 
@@ -80,6 +135,10 @@ private
 
     return tp
 
+  def strip_self(str):
+    index = str.find(' self,')
+    return '('+str[index+6:]
+
   structs_and_enums = json.load(open('../../../cimgui/generator/output/structs_and_enums.json'))
   enums = structs_and_enums['enums']
   structs = structs_and_enums['structs']
@@ -95,6 +154,14 @@ private
     fstr = adjust_typedef(t) + ' ' + n
     fstr = re.sub('(.*) (.*)\[(.*)\]', '\g<1>[\g<3>] \g<2>', fstr)
     return fstr
+
+  def adjust_callargs(callargs):
+    if len(callargs) == 2:
+      return '(this)'
+    return '(this, ' + callargs[1:-1] + ')'
+
+  def get_struct_functions(sname, functions):
+    return {fname: function for fname, function in functions.items() if function.get('stname', 0) == sname}
 %>
 
 % for tname, tp in typedefs.items():
@@ -163,6 +230,13 @@ struct ImVector(T)
         return range()[--Size];
     }
     T[] range() { return Data[0..Size]; }
+    const(T[]) range() const { return Data[0..Size]; }
+    ref T opIndex(int index) {
+        return range()[index];
+    }
+    ref const(T) opIndex(int index) const {
+        return range()[index];
+    }
 }
 
 % for vector_alias, vt in vector_types.items():
@@ -175,25 +249,40 @@ struct ${sname}
 %   for field in sfields:
     ${get_struct_field(field['type'], field['name'])};
 %   endfor
+
+% for fname, function in get_struct_functions(sname, functions).items():
+//    alias ${fname[len(sname)+1:]} = ${fname};
+<% retstr = '' if function['ret'] == 'void' else 'return ' %>
+% if '* self' in function['args']:
+    ${adjust_typedef(function['ret'])} ${fname[len(sname)+1:].replace(sname, 'from')}(A...)(A a) { ${retstr}${fname}(&this, a); }
+% else:
+    static ${adjust_typedef(function['ret'])} ${fname[len(sname)+1:].replace(sname, 'from')}(A...)(A a) { ${retstr}${fname}(a); }
+% endif
+//    ${adjust_typedef(function['ret'])} ${fname[len(sname)+1:]}${adjust_args(function['args'],function['defaults']).replace(sname + '* self,','').replace(sname + '* self','')} { ${retstr}${fname}(this, ${function['call_args'][1:-1]}); }
+% endfor
 }
+
 % endfor
 
-extern(C) @nogc nothrow
+extern(C) nothrow
 {
     alias ImGuiAllocFunc = void* function(size_t sz, void* user_data);
 	alias ImGuiFreeFunc = void function(void* ptr, void* user_data);
 	alias ImGuiSizeCallback = void function(ImGuiSizeCallbackData* data);
 	alias ImGuiInputTextCallback = int function(ImGuiInputTextCallbackData *data);
 	alias ImDrawCallback = void function(const ImDrawList* parent_list,const ImDrawCmd* cmd);
-	alias GetClipboardTextFunc = const char* function(void* user_data);
+	alias GetClipboardTextFunc = const(char)* function(void* user_data);
 	alias SetClipboardTextFunc = void function(void* user_data,const char* text);
 	alias ImeSetInputScreenPosFunc = void function(int x,int y);
+
+	alias ImGuiItemGetter = bool function(void* data,int idx,const char** out_text);
+	alias ImGuiValuesGetter = float function(void* data,int idx);
 }
 
 extern(C) @nogc nothrow
 {
 % for fname, function in functions.items():
-    alias da_${fname} = ${function[0]['ret']} function${adjust_args(function[0]['argsoriginal'])};
+    alias da_${fname} = ${adjust_typedef(function['ret'])} function${adjust_args(function['args'],function['defaults'])};
 % endfor
 }
 

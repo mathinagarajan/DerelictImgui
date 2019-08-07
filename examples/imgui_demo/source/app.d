@@ -10,7 +10,6 @@ import imgui_glfw;
 import imgui_demo;
 
 GLFWwindow* window;
-float[3] clear_color = [0.3f, 0.4f, 0.8f];
 bool showDDemoWindow;
 bool showOrgDemoWindow;
 
@@ -24,13 +23,20 @@ void main(string[] argv) {
 	window = initWindow("ImGui OpenGL3 example");
 	if(!window) return;
 
+	igCreateContext();
+
 	// Setup ImGui binding
 	igImplGlfwGL3_Init(window, true);
+	igImplOpenGL3_Init("unused");
+
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	// Main loop
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
+		igImplOpenGL3_NewFrame();
 		igImplGlfwGL3_NewFrame();
+		igNewFrame();
 
 		// contents
 		if(igButton("RUN imgui_demo (D-lang version)")) showDDemoWindow = !showDDemoWindow;
@@ -44,18 +50,27 @@ void main(string[] argv) {
 			derelict.imgui.imgui.igShowDemoWindow(&showOrgDemoWindow);
 		}
 
-		// Rendering
-		auto io = igGetIO();
-		glViewport(0, 0, cast(int)io.DisplaySize.x, cast(int)io.DisplaySize.y);
-		glClearColor(clear_color[0], clear_color[1], clear_color[2], 0);
-		glClear(GL_COLOR_BUFFER_BIT);
+        // Rendering
 		igRender();
-		glfwSwapBuffers(window);
+        int display_w, display_h;
+        glfwMakeContextCurrent(window);
+        glfwGetFramebufferSize(window, &display_w, &display_h);
+        glViewport(0, 0, display_w, display_h);
+        glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
+        glClear(GL_COLOR_BUFFER_BIT);
+        igImplOpenGL3_RenderDrawData(igGetDrawData());
+
+        glfwMakeContextCurrent(window);
+        glfwSwapBuffers(window);
 	}
 
-	// Cleanup
-	igImplGlfwGL3_Shutdown();
-	glfwTerminate();
+    // Cleanup
+    igImplOpenGL3_Shutdown();
+    igImplGlfwGL3_Shutdown();
+	igDestroyContext();
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 GLFWwindow* initWindow(string title) {
@@ -65,9 +80,7 @@ GLFWwindow* initWindow(string title) {
 	if (!glfwInit())
 		return null;
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 	auto window = glfwCreateWindow(1280, 720, title.toStringz(), null, null);
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(1); // Enable vsync
