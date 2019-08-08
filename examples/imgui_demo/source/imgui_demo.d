@@ -523,12 +523,12 @@ void igShowDemoWindow(bool* p_open)
             float tex_h = cast(float)igGetIO().Fonts.TexHeight;
             ImTextureID tex_id = igGetIO().Fonts.TexID;
             igText("%.0fx%.0f", tex_w, tex_h);
+			ImVec2 pos = igGetCursorScreenPos();
             igImage(tex_id, ImVec2(tex_w, tex_h), ImVec2(0,0), ImVec2(1,1), ImVec4(255,255,255,255), ImVec4(255,255,255,128));
             if (igIsItemHovered())
             {
                 igBeginTooltip();
                 float focus_sz = 32.0f;
-                ImVec2 pos = igGetMousePos();
                 float focus_x = pos.x - tex_screen_pos.x - focus_sz * 0.5f; if (focus_x < 0.0f) focus_x = 0.0f; else if (focus_x > tex_w - focus_sz) focus_x = tex_w - focus_sz;
                 float focus_y = pos.y - tex_screen_pos.y - focus_sz * 0.5f; if (focus_y < 0.0f) focus_y = 0.0f; else if (focus_y > tex_h - focus_sz) focus_y = tex_h - focus_sz;
                 igText("Min: (%.2f, %.2f)", focus_x, focus_y);
@@ -850,7 +850,7 @@ void igShowDemoWindow(bool* p_open)
             static float begin = 10, end = 90;
             static int begin_i = 100, end_i = 1000;
             igDragFloatRange2("range", &begin, &end, 0.25f, 0.0f, 100.0f, "Min: %.1f %%", "Max: %.1f %%");
-            igDragIntRange2("range int (no bounds)", &begin_i, &end_i, 5, 0, 0, "Min: %.0f units", "Max: %.0f units");
+            igDragIntRange2("range int (no bounds)", &begin_i, &end_i, 5, 0, 0, "Min: %d units", "Max: %d units");
             igTreePop();
         }
 
@@ -1203,9 +1203,9 @@ void igShowDemoWindow(bool* p_open)
             static int track_line = 50, scroll_to_px = 200;
             igCheckbox("Track", &track);
             igPushItemWidth(100);
-            igSameLine(130); track |= igDragInt("##line", &track_line, 0.25f, 0, 99, "Line = %.0f");
+            igSameLine(130); track |= igDragInt("##line", &track_line, 0.25f, 0, 99, "Line = %d");
             bool scroll_to = igButton("Scroll To Pos");
-            igSameLine(130); scroll_to |= igDragInt("##pos_y", &scroll_to_px, 1.00f, 0, 9999, "Y = %.0f px");
+            igSameLine(130); scroll_to |= igDragInt("##pos_y", &scroll_to_px, 1.00f, 0, 9999, "Y = %d px");
             igPopItemWidth();
             if (scroll_to) track = false;
 
@@ -1833,7 +1833,7 @@ void igShowDemoWindow(bool* p_open)
 
         if (igTreeNodeExStr("Mouse cursors"))
         {
-            const string[] mouse_cursors_names = [ "Arrow", "TextInput", "Move", "ResizeNS", "ResizeEW", "ResizeNESW", "ResizeNWSE" ];
+            const string[] mouse_cursors_names = [ "Arrow", "TextInput", "Move", "ResizeNS", "ResizeEW", "ResizeNESW", "ResizeNWSE", "Hand" ];
             assert(mouse_cursors_names.length == ImGuiMouseCursor_COUNT);
 
             igText("Current mouse cursor = %d: %s", igGetMouseCursor(), toStringz(mouse_cursors_names[igGetMouseCursor()]));
