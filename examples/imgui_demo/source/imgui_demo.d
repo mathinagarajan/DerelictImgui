@@ -317,7 +317,7 @@ void igShowDemoWindow(bool* p_open)
                 igDragInt("drag int", &i1, 1);
                 igSameLine(); ShowHelpMarker("Click and drag to edit value.\nHold SHIFT/ALT for faster/slower edit.\nDouble-click or CTRL+click to input value.");
 
-                igDragInt("drag int 0..100", &i2, 1, 0, 100, "%.0f%%");
+                igDragInt("drag int 0..100", &i2, 1, 0, 100, "%d%%");
 
                 static float f1=1.00f, f2=0.0067f;
                 igDragFloat("drag float", &f1, 0.005f);

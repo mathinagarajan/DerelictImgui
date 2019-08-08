@@ -1198,7 +1198,7 @@ struct ImFontAtlas
 //    alias GetMouseCursorTexData = ImFontAtlas_GetMouseCursorTexData;
 
     bool GetMouseCursorTexData(A...)(A a) { return ImFontAtlas_GetMouseCursorTexData(&this, a); }
-//    bool GetMouseCursorTexData(ImGuiMouseCursor cursor,ImVec2* out_offset,ImVec2* out_size,ImVec2[2] out_uv_border,ImVec2[2] out_uv_fill) { return ImFontAtlas_GetMouseCursorTexData(this, cursor,out_offset,out_size,out_uv_border,out_uv_fill); }
+//    bool GetMouseCursorTexData(ImGuiMouseCursor cursor,ImVec2* out_offset,ImVec2* out_size,ref ImVec2[2] out_uv_border,ref ImVec2[2] out_uv_fill) { return ImFontAtlas_GetMouseCursorTexData(this, cursor,out_offset,out_size,out_uv_border,out_uv_fill); }
 //    alias GetGlyphRangesKorean = ImFontAtlas_GetGlyphRangesKorean;
 
     const(ImWchar)* GetGlyphRangesKorean(A...)(A a) { return ImFontAtlas_GetGlyphRangesKorean(&this, a); }
@@ -1767,12 +1767,12 @@ extern(C) @nogc nothrow
     alias da_igIsWindowFocused = bool function(ImGuiFocusedFlags flags = 0);
     alias da_igRender = void function();
     alias da_ImDrawList_ChannelsSetCurrent = void function(ImDrawList* self,int channel_index);
-    alias da_igDragFloat4 = bool function(const char* label,float[4] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
+    alias da_igDragFloat4 = bool function(const char* label,ref float[4] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
     alias da_ImDrawList_ChannelsSplit = void function(ImDrawList* self,int channels_count);
     alias da_igIsMousePosValid = bool function(const ImVec2* mouse_pos = null);
     alias da_igGetCursorScreenPos = ImVec2 function();
     alias da_igDebugCheckVersionAndDataLayout = bool function(const char* version_str,size_t sz_io,size_t sz_style,size_t sz_vec2,size_t sz_vec4,size_t sz_drawvert);
-    alias da_igSliderFloat4 = bool function(const char* label,float[4] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
+    alias da_igSliderFloat4 = bool function(const char* label,ref float[4] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
     alias da_igSetScrollY = void function(float scroll_y);
     alias da_CustomRect_destroy = void function(CustomRect* self);
     alias da_igGetStateStorage = ImGuiStorage* function();
@@ -1780,7 +1780,7 @@ extern(C) @nogc nothrow
     alias da_ImFontAtlas_destroy = void function(ImFontAtlas* self);
     alias da_ImGuiStorage_GetBoolRef = bool* function(ImGuiStorage* self,ImGuiID key,bool default_val = false);
     alias da_igInputScalarN = bool function(const char* label,ImGuiDataType data_type,void* v,int components,const void* step = null,const void* step_fast = null,const char* format = null,ImGuiInputTextFlags extra_flags = 0);
-    alias da_igColorPicker4 = bool function(const char* label,float[4] col,ImGuiColorEditFlags flags = 0,const float* ref_col = null);
+    alias da_igColorPicker4 = bool function(const char* label,ref float[4] col,ImGuiColorEditFlags flags = 0,const float* ref_col = null);
     alias da_ImGuiInputTextCallbackData_destroy = void function(ImGuiInputTextCallbackData* self);
     alias da_igSetScrollFromPosY = void function(float pos_y,float center_y_ratio = 0.5f);
     alias da_ImDrawCmd_destroy = void function(ImDrawCmd* self);
@@ -1793,7 +1793,7 @@ extern(C) @nogc nothrow
     alias da_ImGuiPayload_destroy = void function(ImGuiPayload* self);
     alias da_ImColor_SetHSV = void function(ImColor* self,float h,float s,float v,float a = 1.0f);
     alias da_Pair_destroy = void function(Pair* self);
-    alias da_igDragFloat3 = bool function(const char* label,float[3] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
+    alias da_igDragFloat3 = bool function(const char* label,ref float[3] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
     alias da_ImDrawList_AddPolyline = void function(ImDrawList* self,const ImVec2* points,const int num_points,ImU32 col,bool closed,float thickness);
     alias da_ImGuiTextBuffer_destroy = void function(ImGuiTextBuffer* self);
     alias da_igCalcTextSize = ImVec2 function(const char* text,const char* text_end = null,bool hide_text_after_double_hash = false,float wrap_width = -1.0f);
@@ -1822,7 +1822,7 @@ extern(C) @nogc nothrow
     alias da_igSetCursorScreenPos = void function(const ImVec2 screen_pos);
     alias da_ImFont_AddRemapChar = void function(ImFont* self,ImWchar dst,ImWchar src,bool overwrite_dst = true);
     alias da_ImFont_AddGlyph = void function(ImFont* self,ImWchar c,float x0,float y0,float x1,float y1,float u0,float v0,float u1,float v1,float advance_x);
-    alias da_igInputInt4 = bool function(const char* label,int[4] v,ImGuiInputTextFlags extra_flags = 0);
+    alias da_igInputInt4 = bool function(const char* label,ref int[4] v,ImGuiInputTextFlags extra_flags = 0);
     alias da_ImFont_GrowIndex = void function(ImFont* self,int new_size);
     alias da_ImFont_RenderText = void function(ImFont* self,ImDrawList* draw_list,float size,ImVec2 pos,ImU32 col,const ImVec4 clip_rect,const char* text_begin,const char* text_end,float wrap_width = 0.0f,bool cpu_fine_clip = false);
     alias da_igIsRectVisible = bool function(const ImVec2 size);
@@ -1849,7 +1849,7 @@ extern(C) @nogc nothrow
     alias da_igImageButton = bool function(ImTextureID user_texture_id,const ImVec2 size,const ImVec2 uv0 = ImVec2(0,0),const ImVec2 uv1 = ImVec2(1,1),int frame_padding = -1,const ImVec4 bg_col = ImVec4(0,0,0,0),const ImVec4 tint_col = ImVec4(1,1,1,1));
     alias da_ImFont_FindGlyph = const(ImFontGlyph)* function(ImFont* self,ImWchar c);
     alias da_igEndFrame = void function();
-    alias da_igSliderFloat2 = bool function(const char* label,float[2] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
+    alias da_igSliderFloat2 = bool function(const char* label,ref float[2] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
     alias da_ImFont_RenderChar = void function(ImFont* self,ImDrawList* draw_list,float size,ImVec2 pos,ImU32 col,ImWchar c);
     alias da_igRadioButtonBool = bool function(const char* label,bool active);
     alias da_igRadioButtonIntPtr = bool function(const char* label,int* v,int v_button);
@@ -1862,7 +1862,7 @@ extern(C) @nogc nothrow
     alias da_igNewLine = void function();
     alias da_igIsItemFocused = bool function();
     alias da_ImFont_ImFont = ImFont* function();
-    alias da_igSliderInt2 = bool function(const char* label,int[2] v,int v_min,int v_max,const char* format = "%d");
+    alias da_igSliderInt2 = bool function(const char* label,ref int[2] v,int v_min,int v_max,const char* format = "%d");
     alias da_ImGuiStorage_SetAllInt = void function(ImGuiStorage* self,int val);
     alias da_igSetWindowSizeVec2 = void function(const ImVec2 size,ImGuiCond cond = 0);
     alias da_igSetWindowSizeStr = void function(const char* name,const ImVec2 size,ImGuiCond cond = 0);
@@ -1926,7 +1926,7 @@ extern(C) @nogc nothrow
     alias da_ImDrawList_PushTextureID = void function(ImDrawList* self,ImTextureID texture_id);
     alias da_igTreeAdvanceToLabelPos = void function();
     alias da_ImGuiInputTextCallbackData_DeleteChars = void function(ImGuiInputTextCallbackData* self,int pos,int bytes_count);
-    alias da_igDragInt2 = bool function(const char* label,int[2] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
+    alias da_igDragInt2 = bool function(const char* label,ref int[2] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
     alias da_igArrowButton = bool function(const char* str_id,ImGuiDir dir);
     alias da_igIsAnyItemActive = bool function();
     alias da_ImDrawList_AddBezierCurve = void function(ImDrawList* self,const ImVec2 pos0,const ImVec2 cp0,const ImVec2 cp1,const ImVec2 pos1,ImU32 col,float thickness,int num_segments = 0);
@@ -1976,7 +1976,7 @@ extern(C) @nogc nothrow
     alias da_igGetColorU32U32 = ImU32 function(ImU32 col);
     alias da_igVSliderInt = bool function(const char* label,const ImVec2 size,int* v,int v_min,int v_max,const char* format = "%d");
     alias da_igInvisibleButton = bool function(const char* str_id,const ImVec2 size);
-    alias da_igInputInt2 = bool function(const char* label,int[2] v,ImGuiInputTextFlags extra_flags = 0);
+    alias da_igInputInt2 = bool function(const char* label,ref int[2] v,ImGuiInputTextFlags extra_flags = 0);
     alias da_ImDrawList_PrimRect = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,ImU32 col);
     alias da_ImDrawList_AddRectFilled = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,ImU32 col,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All);
     alias da_ImDrawList_ClearFreeMemory = void function(ImDrawList* self);
@@ -1988,13 +1988,13 @@ extern(C) @nogc nothrow
     alias da_igSetTooltipV = void function(const char* fmt,va_list args);
     alias da_igEndGroup = void function();
     alias da_igGetIO = ImGuiIO* function();
-    alias da_igDragInt4 = bool function(const char* label,int[4] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
+    alias da_igDragInt4 = bool function(const char* label,ref int[4] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
     alias da_igNextColumn = void function();
     alias da_ImDrawList_AddRect = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,ImU32 col,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All,float thickness = 1.0f);
     alias da_TextRange_split = void function(TextRange* self,char separator,ImVector_TextRange* out_);
     alias da_igSetCursorPos = void function(const ImVec2 local_pos);
     alias da_igBeginPopupModal = bool function(const char* name,bool* p_open = null,ImGuiWindowFlags flags = 0);
-    alias da_igSliderInt4 = bool function(const char* label,int[4] v,int v_min,int v_max,const char* format = "%d");
+    alias da_igSliderInt4 = bool function(const char* label,ref int[4] v,int v_min,int v_max,const char* format = "%d");
     alias da_ImDrawList_PathRect = void function(ImDrawList* self,const ImVec2 rect_min,const ImVec2 rect_max,float rounding = 0.0f,int rounding_corners_flags = ImDrawCornerFlags_All);
     alias da_igShowMetricsWindow = void function(bool* p_open = null);
     alias da_igGetScrollMaxY = float function();
@@ -2033,12 +2033,12 @@ extern(C) @nogc nothrow
     alias da_igSetNextWindowFocus = void function();
     alias da_igSameLine = void function(float pos_x = 0.0f,float spacing_w = -1.0f);
     alias da_igBegin = bool function(const char* name,bool* p_open = null,ImGuiWindowFlags flags = 0);
-    alias da_igColorEdit3 = bool function(const char* label,float[3] col,ImGuiColorEditFlags flags = 0);
+    alias da_igColorEdit3 = bool function(const char* label,ref float[3] col,ImGuiColorEditFlags flags = 0);
     alias da_ImDrawList_AddCircleFilled = void function(ImDrawList* self,const ImVec2 centre,float radius,ImU32 col,int num_segments = 12);
     alias da_ImGuiIO_AddInputCharactersUTF8 = void function(ImGuiIO* self,const char* utf8_chars);
     alias da_ImDrawList_AddCircle = void function(ImDrawList* self,const ImVec2 centre,float radius,ImU32 col,int num_segments = 12,float thickness = 1.0f);
     alias da_ImDrawList_AddTriangleFilled = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 c,ImU32 col);
-    alias da_igDragFloat2 = bool function(const char* label,float[2] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
+    alias da_igDragFloat2 = bool function(const char* label,ref float[2] v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
     alias da_igPushButtonRepeat = void function(bool repeat);
     alias da_igPopItemWidth = void function();
     alias da_ImDrawList_AddTriangle = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 c,ImU32 col,float thickness = 1.0f);
@@ -2060,7 +2060,7 @@ extern(C) @nogc nothrow
     alias da_ImDrawList_PopTextureID = void function(ImDrawList* self);
     alias da_igSetWindowFocus = void function();
     alias da_igSetWindowFocusStr = void function(const char* name);
-    alias da_igInputFloat4 = bool function(const char* label,float[4] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
+    alias da_igInputFloat4 = bool function(const char* label,ref float[4] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
     alias da_ImDrawList_ImDrawList = ImDrawList* function(const ImDrawListSharedData* shared_data);
     alias da_igGetVersion = const(char)* function();
     alias da_igEndCombo = void function();
@@ -2090,14 +2090,14 @@ extern(C) @nogc nothrow
     alias da_ImGuiPayload_ImGuiPayload = ImGuiPayload* function();
     alias da_igBeginMainMenuBar = bool function();
     alias da_CustomRect_CustomRect = CustomRect* function();
-    alias da_ImGuiInputTextCallbackData_InsertChars = void function(ImGuiInputTextCallbackData* self,int pos,const(char)* text,const char* text_end = null);
+    alias da_ImGuiInputTextCallbackData_InsertChars = void function(ImGuiInputTextCallbackData* self,int pos,const char* text,const char* text_end = null);
     alias da_ImGuiStorage_GetFloat = float function(ImGuiStorage* self,ImGuiID key,float default_val = 0.0f);
-    alias da_ImFontAtlas_GetMouseCursorTexData = bool function(ImFontAtlas* self,ImGuiMouseCursor cursor,ImVec2* out_offset,ImVec2* out_size,ImVec2[2] out_uv_border,ImVec2[2] out_uv_fill);
+    alias da_ImFontAtlas_GetMouseCursorTexData = bool function(ImFontAtlas* self,ImGuiMouseCursor cursor,ImVec2* out_offset,ImVec2* out_size,ref ImVec2[2] out_uv_border,ref ImVec2[2] out_uv_fill);
     alias da_igVSliderScalar = bool function(const char* label,const ImVec2 size,ImGuiDataType data_type,void* v,const void* v_min,const void* v_max,const char* format = null,float power = 1.0f);
     alias da_ImGuiStorage_GetVoidPtrRef = void** function(ImGuiStorage* self,ImGuiID key,void* default_val = null);
     alias da_ImFontConfig_destroy = void function(ImFontConfig* self);
     alias da_igStyleColorsLight = void function(ImGuiStyle* dst = null);
-    alias da_igSliderFloat3 = bool function(const char* label,float[3] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
+    alias da_igSliderFloat3 = bool function(const char* label,ref float[3] v,float v_min,float v_max,const char* format = "%.3f",float power = 1.0f);
     alias da_igSetAllocatorFunctions = void function(ImGuiAllocFunc,ImGuiFreeFunc,void* user_data = null);
     alias da_igDragFloat = bool function(const char* label,float* v,float v_speed = 1.0f,float v_min = 0.0f,float v_max = 0.0f,const char* format = "%.3f",float power = 1.0f);
     alias da_ImGuiStorage_GetIntRef = int* function(ImGuiStorage* self,ImGuiID key,int default_val = 0);
@@ -2136,7 +2136,7 @@ extern(C) @nogc nothrow
     alias da_ImDrawList_PrimWriteVtx = void function(ImDrawList* self,const ImVec2 pos,const ImVec2 uv,ImU32 col);
     alias da_igBullet = void function();
     alias da_ImGuiIO_ImGuiIO = ImGuiIO* function();
-    alias da_igInputInt3 = bool function(const char* label,int[3] v,ImGuiInputTextFlags extra_flags = 0);
+    alias da_igInputInt3 = bool function(const char* label,ref int[3] v,ImGuiInputTextFlags extra_flags = 0);
     alias da_TextRange_end = const(char)* function(TextRange* self);
     alias da_igStyleColorsDark = void function(ImGuiStyle* dst = null);
     alias da_igInputInt = bool function(const char* label,int* v,int step = 1,int step_fast = 100,ImGuiInputTextFlags extra_flags = 0);
@@ -2146,7 +2146,7 @@ extern(C) @nogc nothrow
     alias da_TextRange_TextRange = TextRange* function();
     alias da_TextRange_TextRangeStr = TextRange* function(const char* _b,const char* _e);
     alias da_igSetNextWindowPos = void function(const ImVec2 pos,ImGuiCond cond = 0,const ImVec2 pivot = ImVec2(0,0));
-    alias da_igDragInt3 = bool function(const char* label,int[3] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
+    alias da_igDragInt3 = bool function(const char* label,ref int[3] v,float v_speed = 1.0f,int v_min = 0,int v_max = 0,const char* format = "%d");
     alias da_igOpenPopup = void function(const char* str_id);
     alias da_igSetColumnOffset = void function(int column_index,float offset_x);
     alias da_ImDrawList_GetClipRectMax = ImVec2 function(ImDrawList* self);
@@ -2205,7 +2205,7 @@ extern(C) @nogc nothrow
     alias da_ImGuiStyle_ScaleAllSizes = void function(ImGuiStyle* self,float scale_factor);
     alias da_igGetItemRectSize = ImVec2 function();
     alias da_igMemAlloc = void* function(size_t size);
-    alias da_igColorPicker3 = bool function(const char* label,float[3] col,ImGuiColorEditFlags flags = 0);
+    alias da_igColorPicker3 = bool function(const char* label,ref float[3] col,ImGuiColorEditFlags flags = 0);
     alias da_igSetCurrentContext = void function(ImGuiContext* ctx);
     alias da_igPushItemWidth = void function(float item_width);
     alias da_igGetStyle = ImGuiStyle* function();
@@ -2253,7 +2253,7 @@ extern(C) @nogc nothrow
     alias da_igGetWindowWidth = float function();
     alias da_igGetWindowContentRegionMin = ImVec2 function();
     alias da_ImGuiStorage_GetInt = int function(ImGuiStorage* self,ImGuiID key,int default_val = 0);
-    alias da_igSliderInt3 = bool function(const char* label,int[3] v,int v_min,int v_max,const char* format = "%d");
+    alias da_igSliderInt3 = bool function(const char* label,ref int[3] v,int v_min,int v_max,const char* format = "%d");
     alias da_igPushTextWrapPos = void function(float wrap_pos_x = 0.0f);
     alias da_igSliderScalarN = bool function(const char* label,ImGuiDataType data_type,void* v,int components,const void* v_min,const void* v_max,const char* format = null,float power = 1.0f);
     alias da_ImColor_HSV = ImColor function(ImColor* self,float h,float s,float v,float a = 1.0f);
@@ -2264,10 +2264,10 @@ extern(C) @nogc nothrow
     alias da_igImage = void function(ImTextureID user_texture_id,const ImVec2 size,const ImVec2 uv0 = ImVec2(0,0),const ImVec2 uv1 = ImVec2(1,1),const ImVec4 tint_col = ImVec4(1,1,1,1),const ImVec4 border_col = ImVec4(0,0,0,0));
     alias da_ImGuiTextBuffer_ImGuiTextBuffer = ImGuiTextBuffer* function();
     alias da_igBulletText = void function(const char* fmt,...);
-    alias da_igInputFloat2 = bool function(const char* label,float[2] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
+    alias da_igInputFloat2 = bool function(const char* label,ref float[2] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
     alias da_igGetTextLineHeightWithSpacing = float function();
     alias da_ImDrawList_PrimRectUV = void function(ImDrawList* self,const ImVec2 a,const ImVec2 b,const ImVec2 uv_a,const ImVec2 uv_b,ImU32 col);
-    alias da_igColorEdit4 = bool function(const char* label,float[4] col,ImGuiColorEditFlags flags = 0);
+    alias da_igColorEdit4 = bool function(const char* label,ref float[4] col,ImGuiColorEditFlags flags = 0);
     alias da_igLogToClipboard = void function(int max_depth = -1);
     alias da_igBeginPopupContextWindow = bool function(const char* str_id = null,int mouse_button = 1,bool also_over_items = true);
     alias da_ImFontAtlas_ImFontAtlas = ImFontAtlas* function();
@@ -2294,7 +2294,7 @@ extern(C) @nogc nothrow
     alias da_igGetScrollMaxX = float function();
     alias da_igSetTooltip = void function(const char* fmt,...);
     alias da_igGetContentRegionAvail = ImVec2 function();
-    alias da_igInputFloat3 = bool function(const char* label,float[3] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
+    alias da_igInputFloat3 = bool function(const char* label,ref float[3] v,const char* format = "%.3f",ImGuiInputTextFlags extra_flags = 0);
     alias da_igSetKeyboardFocusHere = void function(int offset = 0);
 }
 
