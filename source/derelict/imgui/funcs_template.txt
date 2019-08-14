@@ -82,15 +82,20 @@ uint IM_COL32(ubyte R, ubyte G, ubyte B, ubyte A = 255) {
   for _, function_list in functionsWide.items():
     for function in function_list:
       fname = function.get('ov_cimguiname', function['cimguiname'])
-      if "_nonUDT" in fname:
+      if "_nonUDT2" in fname:
         continue
       if 'destructor' in function:
         function['funcname'] = 'destroy'
         function['ret'] = 'void'
       if 'constructor' in function:
         function['ret'] = function['stname'] + '*'
+      if function['ret'] in ['ImVec2', 'ImColor', 'ImVec4']:
+        continue
       if fname == 'igColorConvertRGBtoHSV' or fname == 'igColorConvertHSVtoRGB':
         function['args'] = function['args'].replace('float out', 'float* out')
+      if '_nonUDT' in fname:
+        function['UDTret'] = function['argsT'][0]['type'][0:-1]
+        function['UDTfname'] = fname.replace('_nonUDT','')
       functions[fname] = function
 
   import re
@@ -250,15 +255,21 @@ struct ${sname}
     ${get_struct_field(field['type'], field['name'])};
 %   endfor
 
+<%!
+  def retstr(function):
+    return '' if function['ret'] == 'void' else 'return '
+%>
 % for fname, function in get_struct_functions(sname, functions).items():
-//    alias ${fname[len(sname)+1:]} = ${fname};
-<% retstr = '' if function['ret'] == 'void' else 'return ' %>
-% if '* self' in function['args']:
-    ${adjust_typedef(function['ret'])} ${fname[len(sname)+1:].replace(sname, 'from')}(A...)(A a) { ${retstr}${fname}(&this, a); }
+//    ${adjust_typedef(function['ret'])} function${adjust_args(function['args'],function['defaults']).replace(sname + '* self,','').replace(sname + '* self','')} }
+% if '_nonUDT' in fname:
+    ${function['UDTret']} ${fname[len(sname)+1:].replace('_nonUDT','')}(A...)(A a) { return ${function['UDTfname']}(&this, a); }
 % else:
-    static ${adjust_typedef(function['ret'])} ${fname[len(sname)+1:].replace(sname, 'from')}(A...)(A a) { ${retstr}${fname}(a); }
+% if '* self' in function['args']:
+    ${adjust_typedef(function['ret'])} ${fname[len(sname)+1:].replace(sname, 'from')}(A...)(A a) { ${retstr(function)}${fname}(&this, a); }
+% else:
+    static ${adjust_typedef(function['ret'])} ${fname[len(sname)+1:].replace(sname, 'from')}(A...)(A a) { ${retstr(function)}${fname}(a); }
 % endif
-//    ${adjust_typedef(function['ret'])} ${fname[len(sname)+1:]}${adjust_args(function['args'],function['defaults']).replace(sname + '* self,','').replace(sname + '* self','')} { ${retstr}${fname}(this, ${function['call_args'][1:-1]}); }
+% endif
 % endfor
 }
 
@@ -340,9 +351,18 @@ final class DerelictImguiLoader : SharedLibLoader
     }
 }
 
+// UDT converters
+% for fname, function in functions.items():
+%   if '_nonUDT' in fname:
+${function['UDTret']} ${function['UDTfname']}(A...)(A a) { ${function['UDTret']} ret; ${fname}(&ret, a); return ret; }
+%   endif
+% endfor
+
+
 __gshared DerelictImguiLoader DerelictImgui;
 
 shared static this()
 {
     DerelictImgui = new DerelictImguiLoader();
 }
+
